@@ -5,3 +5,11 @@ export const updateCondition = (key, value) => {
         value: value,
     }
 }
+
+export const updateUserProfile = (key, value) => {
+  return {
+    type: 'UPDATE_USER_PROFILE',
+    key,
+    value
+  }
+}

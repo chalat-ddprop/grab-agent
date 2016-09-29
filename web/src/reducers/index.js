@@ -1,10 +1,14 @@
 import { combineReducers } from 'redux'
-import conditions from './conditions'
+import socket from './socket'
 import route from './route'
+import userProfile from './userProfile'
+import conditions from './conditions'
 
 const agentSearchApp = combineReducers({
-  conditions,
+  socket,
   route,
+  userProfile,
+  conditions,
 })
 
 export default agentSearchApp

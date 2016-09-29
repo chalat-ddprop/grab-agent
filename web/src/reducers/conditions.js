@@ -1,13 +1,14 @@
 const initialState = {
-  listingType: null,
-  propertyType: null,
+  listingType: 'SALE',
+  propertyType: 'CONDO',
   lat: null,
   lng: null,
   bedroom: null,
   bathroom: null,
-  sizeMin: null,
-  sizeMax: null,
+  floorSizeMin: null,
+  floorSizeMax: null,
   furnishing: null,
+  message: '',
 }
 
 const conditions = (state = initialState, action) => {
