@@ -13,3 +13,28 @@ export const updateUserProfile = (key, value) => {
     value
   }
 }
+
+export const createEnquiry = () => {
+  return (dispatch, getState, { enquiryService }) => {
+    let { apiConnection, userProfile, conditions } = getState();
+
+    if (apiConnection.xhr) {
+      apiConnection.xhr.abort();
+    }
+
+    let xhr = enquiryService.createEnquiry(userProfile, conditions)
+      .then((response) => {
+        return response.json()
+      })
+      .then((json) => {
+        dispatch({
+          type: 'SAVED'
+        })
+      })
+
+    return {
+      type: 'SAVING',
+      xhr: xhr
+    }
+  }
+}

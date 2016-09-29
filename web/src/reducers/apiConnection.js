@@ -2,7 +2,7 @@ const apiConnection = (state = {saving: false, loading: false, xhr: null}, actio
   switch (action.type) {
     case 'SAVING':
       return Object.assign({}, state, {
-        saving: action.saving,
+        saving: true,
         xhr: action.xhr
       })
 
@@ -14,7 +14,7 @@ const apiConnection = (state = {saving: false, loading: false, xhr: null}, actio
 
     case 'LOADING':
       return Object.assign({}, state, {
-        loading: action.loading,
+        loading: true,
         xhr: action.xhr
       })
 
@@ -28,3 +28,5 @@ const apiConnection = (state = {saving: false, loading: false, xhr: null}, actio
       return state;
   }
 }
+
+export default apiConnection

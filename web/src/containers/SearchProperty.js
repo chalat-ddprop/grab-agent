@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { updateCondition } from '../actions';
+import { updateCondition, createEnquiry } from '../actions';
 import _ from 'lodash';
 import { SearchConditions } from '../constants/search';
-import EnquiryService from '../services/EnquiryService';
 import { List, ListItem } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Divider from 'material-ui/Divider';
@@ -141,9 +140,8 @@ class SearchForm extends Component {
           <List className="center">
             <RaisedButton
               label="Create Request"
-              href="#/request-agent"
               secondary={ true }
-              disabled={ !this.props.listingType || !this.props.propertyType }
+              disabled={ this.props.saving || !this.props.listingType || !this.props.propertyType }
               onTouchTap={ this.props.onCreateEnquiry }
             />
           </List>
@@ -155,21 +153,19 @@ class SearchForm extends Component {
 const mapStateToProps = (state) => {
   return {
     title: "Input your dream conditions",
-    ...state.conditions
+    saving: state.apiConnection.saving,
+    ...state.conditions,
   }
 }
 
-const mapDispatchToProps = (dispatch, getState) => {
-  let enquiryService = new EnquiryService();
-
+const mapDispatchToProps = (dispatch) => {
   return {
     onUpdateCondition: (key, value) => {
       dispatch(updateCondition(key, value))
     },
 
     onCreateEnquiry: () => {
-      console.log(getState)
-      enquiryService.createEnquiry()
+      dispatch(createEnquiry())
     }
   }
 }

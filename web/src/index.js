@@ -5,6 +5,7 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import agentSearchApp from './reducers';
 import { Router } from 'director';
+import EnquiryService from './services/EnquiryService';
 import App from './App';
 import './index.css';
 
@@ -13,9 +14,11 @@ import './index.css';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
+let enquiryService = new EnquiryService();
+
 let store = createStore(
   agentSearchApp,
-  applyMiddleware(thunk)
+  applyMiddleware(thunk.withExtraArgument({ enquiryService }))
 )
 
 const changePage = (page, id) => {
