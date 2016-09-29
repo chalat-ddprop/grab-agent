@@ -1,9 +1,8 @@
 {
-  "name": "Hackathon-server",
+  "name": "socket-server",
   "version": "0.0.1",
-  "devDependencies": {
+  "dependencies": {
     "express": "latest",
     "socket.io": "latest"
-  },
-  "dependencies": {}
+  }
 }
