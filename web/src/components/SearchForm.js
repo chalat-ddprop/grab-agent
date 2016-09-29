@@ -80,45 +80,45 @@ class SearchForm extends Component {
           <Divider />
           <List>
             <Subheader>What are you looking for</Subheader>
-            <ListItem primaryText="Listing Type"/>
-            <ListItem>
+            <ListItem primaryText="Listing Type" disabled={ true }/>
+            <ListItem disabled={ true }>
               { this.conditionComponents.listingType }
             </ListItem>
 
             <ListItem primaryText="Property Type"/>
-            <ListItem>
+            <ListItem disabled={ true }>
               { this.conditionComponents.propertyType }
             </ListItem>
           </List>
           <Divider />
           <List>
             <Subheader>Options you need</Subheader>
-            <ListItem primaryText="No. of Bedroom"/>
-            <ListItem>
+            <ListItem primaryText="No. of Bedroom" disabled={ true }/>
+            <ListItem disabled={ true }>
               { this.conditionComponents.bedroom }
             </ListItem>
 
-            <ListItem primaryText="No. of Bathroom"/>
-            <ListItem>
+            <ListItem primaryText="No. of Bathroom" disabled={ true }/>
+            <ListItem disabled={ true }>
               { this.conditionComponents.bathroom }
             </ListItem>
 
-            <ListItem primaryText="Floor Size"/>
-            <ListItem>
+            <ListItem primaryText="Floor Size" disabled={ true }/>
+            <ListItem disabled={ true }>
               { this.conditionComponents.sizeMin }
             </ListItem>
-            <ListItem primaryText="to"/>
-            <ListItem>
+            <ListItem primaryText="to" disabled={ true }/>
+            <ListItem disabled={ true }>
               { this.conditionComponents.sizeMax }
             </ListItem>
 
-            <ListItem primaryText="Furnishing"/>
-            <ListItem>
+            <ListItem primaryText="Furnishing" disabled={ true }/>
+            <ListItem disabled={ true }>
               { this.conditionComponents.furnishing }
             </ListItem>
 
-            <ListItem primaryText="Message"/>
-            <ListItem>
+            <ListItem primaryText="Message" disabled={ true }/>
+            <ListItem disabled={ true }>
               <TextField
                 hintText="I want to see 5 properties this weekend before 5pm"
                 floatingLabelText="Extra conditions to agent"

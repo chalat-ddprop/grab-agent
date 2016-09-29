@@ -10,7 +10,7 @@ class Home extends Component {
     return (
       <div>
         <AppBar
-          title="Guru Agent"/>
+          title="Grab Agent"/>
 
         <SearchProperty/>
 

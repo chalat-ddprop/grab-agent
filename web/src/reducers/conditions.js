@@ -1,6 +1,6 @@
 const initialState = {
-  listingType: null,
-  propertyType: null,
+  listingType: 'SALE',
+  propertyType: 'CONDO',
   lat: null,
   lng: null,
   bedroom: null,
