@@ -5,9 +5,10 @@ const initialState = {
   lng: null,
   bedroom: null,
   bathroom: null,
-  sizeMin: null,
-  sizeMax: null,
+  floorSizeMin: null,
+  floorSizeMax: null,
   furnishing: null,
+  message: '',
 }
 
 const conditions = (state = initialState, action) => {
