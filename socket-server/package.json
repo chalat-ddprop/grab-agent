@@ -1,0 +1,9 @@
+{
+  "name": "Hackathon-server",
+  "version": "0.0.1",
+  "devDependencies": {
+    "express": "latest",
+    "socket.io": "latest"
+  },
+  "dependencies": {}
+}
