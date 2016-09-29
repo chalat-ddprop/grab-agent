@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import { updateCondition } from '../actions';
 import _ from 'lodash';
 import { SearchConditions } from '../constants/search';
-import {List, ListItem} from 'material-ui/List';
+import EnquiryService from '../services/EnquiryService';
+import { List, ListItem } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Divider from 'material-ui/Divider';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -66,7 +67,6 @@ class SearchForm extends Component {
   }
 
   onInputTextField(conditionKey, e) {
-    console.log(e.target.value);
     this.props.onUpdateCondition(conditionKey, e.target.value);
   }
 
@@ -143,8 +143,8 @@ class SearchForm extends Component {
               label="Create Request"
               href="#/request-agent"
               secondary={ true }
-              disabled={ !this.props.conditions.listingType || !this.props.conditions.propertyType }
-              onTouchTap={this.handleTouchTap}
+              disabled={ !this.props.listingType || !this.props.propertyType }
+              onTouchTap={ this.props.onCreateEnquiry }
             />
           </List>
       </div>
@@ -159,11 +159,18 @@ const mapStateToProps = (state) => {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch, getState) => {
+  let enquiryService = new EnquiryService();
+
   return {
-      onUpdateCondition: (key, value) => {
-          dispatch(updateCondition(key, value))
-      }
+    onUpdateCondition: (key, value) => {
+      dispatch(updateCondition(key, value))
+    },
+
+    onCreateEnquiry: () => {
+      console.log(getState)
+      enquiryService.createEnquiry()
+    }
   }
 }
 

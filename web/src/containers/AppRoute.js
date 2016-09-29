@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Home from './Home'
+import Enquiry from './Enquiry'
 import RequestAgent from './RequestAgent';
 import NoMatch from './NoMatch';
 
@@ -16,6 +17,9 @@ class AppRouter extends Component {
     switch (this.props.route.page) {
       case 'home':
         return <Home/>
+
+      case 'enquiry':
+        return <Enquiry/>
 
       case 'request-agent':
         return <RequestAgent/>

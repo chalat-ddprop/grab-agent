@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import agentSearchApp from './reducers'
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import agentSearchApp from './reducers';
 import { Router } from 'director';
 import App from './App';
 import './index.css';
@@ -12,7 +13,10 @@ import './index.css';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
-let store = createStore(agentSearchApp)
+let store = createStore(
+  agentSearchApp,
+  applyMiddleware(thunk)
+)
 
 const changePage = (page, id) => {
   store.dispatch({
