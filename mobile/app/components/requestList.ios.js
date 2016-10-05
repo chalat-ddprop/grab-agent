@@ -7,21 +7,27 @@ import {
   ListView,
   TouchableOpacity,
 } from 'react-native';
+import { connect } from 'react-redux';
 import moment from 'moment';
 
-export default class RequestList extends Component {
-  constructor(props) {
-    super(props);
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    this.state = {
-      data: ds.cloneWithRows(props.list)
-    };
+class RequestList extends Component {
+  componentWillMount() {
+    this.setState({ dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}) });
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.list !== this.props.list) {
+      this.setState({
+        list: nextProps.list,
+        dataSource: this.state.dataSource.cloneWithRows(nextProps.list)
+      })
+    }
   }
 
   render() {
     return (
-      <ListView
-        dataSource={this.state.data}
+      <ListView style={styles.list}
+        dataSource={this.state.dataSource}
         renderRow={(rowData) => <RequestListItem item={rowData} onSelect={this.props.onSelect} />}
       />
     );
@@ -29,16 +35,12 @@ export default class RequestList extends Component {
 }
 
 class RequestListItem extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
-      <TouchableOpacity style={styles.listItem} onPress={this.props.onSelect}>
+      <TouchableOpacity style={styles.listItem} onPress={this.props.onSelect.bind(this, this.props.item)}>
         <View style={styles.listItem_container}>
-          <Image source={require('../../img/me_in_suit_small.jpg')} style={{width: 64, height: 64}} />
-          <Text style={styles.listItem_customername}>{this.props.item.customer}</Text>
+          <Image source={{uri: this.props.item.userProfile.imageUrl}} style={{width: 64, height: 64}} />
+          <Text style={styles.listItem_customername}>{this.props.item.userProfile.firstname} {this.props.item.userProfile.lastname}</Text>
           <Text style={styles.listItem_timestamp}>{moment(this.props.item.timestamp).format('LT')}</Text>
         </View>
       </TouchableOpacity>
@@ -47,10 +49,14 @@ class RequestListItem extends Component {
 }
 
 const styles = StyleSheet.create({
+  list: {
+    borderWidth: 1,
+    borderColor: '#FFF',
+  },
   listItem: {
     borderWidth: 1,
-    borderColor: '#FFA200',
-    backgroundColor: 'white',
+    borderColor: '#FFF',
+    backgroundColor: '#ECF7FA',
     width: 340,
   },
   listItem_container: {
@@ -69,3 +75,9 @@ const styles = StyleSheet.create({
     marginRight: 18
   }
 });
+
+
+export default connect(state => ({
+    list: state.list
+  })
+)(RequestList);

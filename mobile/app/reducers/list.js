@@ -1,6 +1,6 @@
 const list = (state = [], action) => {
   switch (action.type) {
-    case 'TRIGGER':
+    case 'REFRESH':
       return action.list;
 
     default:
