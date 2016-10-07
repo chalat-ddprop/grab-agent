@@ -1,11 +1,13 @@
-var crypto = require('crypto'),
-		express = require('express'),
-		cors = require('cors'),
-		bodyParser = require('body-parser');
+'use strict';
+
+var express = require('express'),
+    cors = require('cors'),
+    bodyParser = require('body-parser');
 
 var apiPort = 4300,
 		socketPort = 3700;
 
+// init socket.io connection
 var socket = require('socket.io-client')('http://localhost:' + socketPort);
 socket.on('connect', function() {
 	console.log("Socket server connected on " + socketPort);
@@ -14,6 +16,25 @@ socket.on('disconnect', function() {
 	console.log("Socket server disconnected on " + socketPort);
 });
 
+// init cmongodb
+var MongoClient = require('mongodb').MongoClient
+  , assert = require('assert');
+
+// Connection URL
+let mongoDbName = 'grab';
+let mongoCollectionName = 'enquiries';
+let mongoUrl = `mongodb://localhost:27017/${mongoDbName}`;
+let dbConnection = null;
+// Use connect method to connect to the Server
+MongoClient.connect(mongoUrl, function(err, db) {
+    if (err) {
+        throw new Error(`Could not connect to mongodb ${mongoUrl}`);
+    }
+    console.log("Mongodb connection ready");
+    dbConnection = db;
+});
+
+// init express
 var app = express()
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,15 +45,23 @@ router.get('/', function(req, res) {
 	res.json({ message: "Server is up and running" });
 });
 
-router.post('/create-enquiry', function(req, res) {
-	var key = randomValueHex(32);
-	req.body.key = key;
-	req.body.timestamp = new Date();
-	db[key] = req.body;
+router.get('/create-enquiry', function(req, res) {
+    dbConnection
+        .collection(mongoCollectionName)
+        .insertOne({
+            'timestamp' : new Date()
+        }, (err, result) => {
+            let doc = result.ops[0];
+            let payload = {
+                'key' : doc._id,
+                'timestamp' : doc.timestamp
+            };
 
-	socket.emit('create_enquiry', req.body);
+            socket.emit('create_enquiry', payload);
 
-	res.json({ enquiryKey: key, enquiryData: req.body, status: 0 });
+            res.json({ enquiryKey: payload.key, enquiryData: payload, status: 0 });
+        })
+    ;
 });
 
 router.get('/get-enquiry', function(req, res) {
@@ -64,13 +93,3 @@ app.use('/api', router);
 app.listen(apiPort);
 
 console.log('Listening on port ' + apiPort);
-
-//----------------------------------------------------------------------------//
-
-var db = {};  // { enquiryKey: {enquiryData}, ... }
-
-function randomValueHex (len) {
-    return crypto.randomBytes(Math.ceil(len/2))
-        .toString('hex') // convert to hexadecimal format
-        .slice(0,len);   // return required number of characters
-}
