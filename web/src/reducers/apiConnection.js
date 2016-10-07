@@ -7,6 +7,7 @@ const apiConnection = (state = {saving: false, loading: false, xhr: null}, actio
       })
 
     case 'SAVED':
+    case 'LOADED':
       return Object.assign({}, state, {
         saving: false,
         xhr: null
@@ -16,12 +17,6 @@ const apiConnection = (state = {saving: false, loading: false, xhr: null}, actio
       return Object.assign({}, state, {
         loading: true,
         xhr: action.xhr
-      })
-
-    case 'LOADED':
-      return Object.assign({}, state, {
-        loading: false,
-        xhr: null
       })
 
     default:

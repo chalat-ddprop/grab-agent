@@ -1,7 +1,12 @@
 const validateUserid = (userid) => {
-  return userid && /[^@]+@[\s\d]+\.(?:[a-z]+){1,}/.test(userid)
+  return userid && /^[^@]+@[\w]+(?:\.[\w]+)+$/.test(userid)
 }
 
-const validateMandatoryFields = (userProfile) {
-  return validateUserid(userProfile.userid) && userProfile.firstname && userProfile.lastname && userProfile.mobile
+const validateMandatoryFields = (userProfile) => {
+  return !!(validateUserid(userProfile.userid) && userProfile.firstname && userProfile.lastname && userProfile.mobile)
+}
+
+module.exports = {
+  validateUserid,
+  validateMandatoryFields
 }

@@ -35,7 +35,7 @@ class SearchForm extends Component {
                       key={ value }
                       label={ label }
                       onClick={ this.props.onUpdateCondition.bind(this, conditionKey, value) }
-                      primary={ this.props[conditionKey] === value }
+                      primary={ this.props.conditions[conditionKey] === value }
                   />)
     })
 
@@ -54,7 +54,7 @@ class SearchForm extends Component {
 
     this.conditionComponents[conditionKey] = (
       <SelectField
-          value={ this.props[conditionKey] }
+          value={ this.props.conditions[conditionKey] }
           onChange={ this.onSelectDropDown.bind(this, conditionKey) }>
         { result }
       </SelectField>
@@ -91,7 +91,7 @@ class SearchForm extends Component {
               { this.conditionComponents.listingType }
             </ListItem>
 
-            <ListItem primaryText="Property Type"/>
+            <ListItem primaryText="Property Type" disabled={ true }/>
             <ListItem disabled={ true }>
               { this.conditionComponents.propertyType }
             </ListItem>
@@ -130,7 +130,7 @@ class SearchForm extends Component {
                 floatingLabelText="Extra conditions to agent"
                 multiLine={ true }
                 fullWidth={ true }
-                value={ this.props.message }
+                value={ this.props.conditions.message }
                 onChange={ this.onInputTextField.bind(this, 'message') }
               />
             </ListItem>
@@ -154,7 +154,8 @@ const mapStateToProps = (state) => {
   return {
     title: "Input your dream conditions",
     saving: state.apiConnection.saving,
-    ...state.conditions,
+    userProfile: state.userProfile,
+    conditions: state.conditions,
   }
 }
 
@@ -164,8 +165,8 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(updateCondition(key, value))
     },
 
-    onCreateEnquiry: () => {
-      dispatch(createEnquiry())
+    onCreateEnquiry: (userProfile, conditions) => {
+      dispatch(createEnquiry(userProfile, conditions))
     }
   }
 }

@@ -4,6 +4,7 @@ import route from './route'
 import apiConnection from './apiConnection'
 import userProfile from './userProfile'
 import conditions from './conditions'
+import enquiries from './enquiries'
 
 const agentSearchApp = combineReducers({
   socket,
@@ -11,6 +12,7 @@ const agentSearchApp = combineReducers({
   apiConnection,
   userProfile,
   conditions,
+  enquiries,
 })
 
 export default agentSearchApp

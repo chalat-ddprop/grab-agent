@@ -1,12 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
-import agentSearchApp from './reducers';
 import { Router } from 'director';
-import EnquiryService from './services/EnquiryService';
 import App from './App';
+import configureStore from './store/configureStore';
 import './index.css';
 
 // Needed for onTouchTap
@@ -14,12 +11,7 @@ import './index.css';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
-let enquiryService = new EnquiryService();
-
-let store = createStore(
-  agentSearchApp,
-  applyMiddleware(thunk.withExtraArgument({ enquiryService }))
-)
+let store = configureStore();
 
 const changePage = (page, id) => {
   store.dispatch({

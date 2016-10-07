@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { updateUserProfile } from '../actions';
 import { List, ListItem } from 'material-ui/List';
+import { validateMandatoryFields } from '../services/UserProfileService';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 
@@ -19,7 +20,7 @@ class UserInfo extends Component {
               floatingLabelText="Email"
               floatingLabelFixed={ true }
               fullWidth={ true }
-              value={ this.props.userid }
+              value={ this.props.userProfile.userid }
               onChange={ this.onInputTextField.bind(this, 'userid') }
             />
           </ListItem>
@@ -29,7 +30,7 @@ class UserInfo extends Component {
               floatingLabelText="Firstname"
               floatingLabelFixed={ true }
               fullWidth={ true }
-              value={ this.props.firstname }
+              value={ this.props.userProfile.firstname }
               onChange={ this.onInputTextField.bind(this, 'firstname') }
             />
           </ListItem>
@@ -39,7 +40,7 @@ class UserInfo extends Component {
               floatingLabelText="Lastname"
               floatingLabelFixed={ true }
               fullWidth={ true }
-              value={ this.props.lastname }
+              value={ this.props.userProfile.lastname }
               onChange={ this.onInputTextField.bind(this, 'lastname') }
             />
           </ListItem>
@@ -49,7 +50,7 @@ class UserInfo extends Component {
               floatingLabelText="Mobile"
               floatingLabelFixed={ true }
               fullWidth={ true }
-              value={ this.props.mobile }
+              value={ this.props.userProfile.mobile }
               onChange={ this.onInputTextField.bind(this, 'mobile') }
             />
           </ListItem>
@@ -60,7 +61,7 @@ class UserInfo extends Component {
             label="Create Request"
             href="#/enquiry"
             secondary={ true }
-            disabled={ !this.props.userid || !this.props.firstname || !this.props.lastname || !this.props.mobile }
+            disabled={ !validateMandatoryFields(this.props.userProfile) }
           />
         </List>
       </div>
@@ -70,7 +71,7 @@ class UserInfo extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    ...state.userProfile
+    userProfile: state.userProfile
   }
 }
 
