@@ -1,11 +1,16 @@
 'use strict';
 
+let imports = {
+    'SDKHttpClient' : require('./lib/SDKHttpClient.class.js'),
+};
+
 var express = require('express'),
     cors = require('cors'),
     bodyParser = require('body-parser');
 
 var apiPort = 4300,
-		socketPort = 3700;
+    socketPort = 3700;
+let apiAccessToken = process.env['PG_ACCESS_TOKEN'] || '';
 
 // init socket.io connection
 var socket = require('socket.io-client')('http://localhost:' + socketPort);
@@ -41,7 +46,7 @@ let mockAgents = [
   },
 ]
 
-// init cmongodb
+// init mongodb
 var MongoClient = require('mongodb').MongoClient
   , ObjectID = require('mongodb').ObjectID
   , assert = require('assert');
@@ -60,6 +65,16 @@ MongoClient.connect(mongoUrl, function(err, db) {
     dbConnection = db;
 });
 
+// init sdks
+let listingSdk = new imports.SDKHttpClient({
+    "scheme" : "https",
+    "host" : "api.staging.propertyguru.com",
+});
+let agentSdk = new imports.SDKHttpClient({
+    "scheme" : "https",
+    "host" : "api.staging.propertyguru.com",
+});
+
 // init express
 var app = express()
 app.use(cors());
@@ -71,7 +86,7 @@ router.get('/', function(req, res) {
 	res.json({ message: "Server is up and running" });
 });
 
-router.post('/create-enquiry', function(req, res) {
+router.use('/create-enquiry', function(req, res) {
     let enquiryData = {
         'conditions': req.body.conditions,
         'userProfile': req.body.userProfile,
@@ -89,13 +104,71 @@ router.post('/create-enquiry', function(req, res) {
                 'timestamp' : doc.timestamp
             };
 
-            socket.emit('create_enquiry', payload);
-            console.log('Created Enquiry: ' + payload.key);
-            console.log(enquiryData);
+            // get all logged in agent ids
+            angetIds = [];
 
-            res.json({ enquiryKey: payload.key, enquiryData: enquiryData, status: 0 });
-        })
-    ;
+            let filters = {
+                'listing_type' : (req.body.conditions.listingType || '').toLowerCase(),
+                'property_type_code' : (req.body.conditions.propertyType || '').toUpperCase(),
+                'center_lat' : parseFloat(req.body.conditions.lat) || 0,
+                'center_long' : parseFloat(req.body.conditions.lng) || 0,
+                'radius' : parseFloat(req.body.conditions.radius) || 0,
+
+                'access_token' : apiAccessToken,
+                'region' : 'th',
+                'status_code' : 'ACT',
+                'agent_id' : angetIds,
+                'limit' : 100,
+            };
+
+            let floorSizeMin = parseFloat(req.body.conditions.floorSizeMin) || -1;
+            if (floorSizeMin >= 0 ) {
+                filters['minsize'] = floorSizeMin;
+            }
+
+            let floorSizeMax = parseFloat(req.body.conditions.floorSizeMax) || -1;
+            if (floorSizeMax >= 0 ) {
+                filters['maxsize'] = floorSizeMax;
+            }
+
+            let beds = parseInt(req.body.conditions.bedroom);
+            if (!isNaN(beds)) {
+                filters['beds'] = beds;
+            }
+
+            let baths = parseInt(req.body.conditions.bathroom);
+            if (!isNaN(baths)) {
+                filters['baths'] = baths;
+            }
+
+            let furnishing = req.body.conditions.furnishing || '';
+            if (furnishing != '') {
+                filters['furnishing'] = furnishing;
+            }
+
+            listingSdk.request('/v1/listings', (err, response) => {
+                if (err) {
+                    console.log(err);
+                    throw new Error('noooooooo');
+                }
+
+                let listings = response.listings || [];
+                let agentIds = {};
+                for (let listing of listings) {
+                    let agentId = listing['agent'] ? listing['agent']['id'] : null;
+                    if (agentId) {
+                        agentIds[agentId] = 1
+                    }
+                }
+                agentIds = Object.keys(agentIds);
+                console.log("Agent ids");
+                console.log(agentIds);
+
+                socket.emit('create_enquiry', payload);
+
+                res.json({ enquiryKey: payload.key, enquiryData: payload, status: 0 });
+            });
+        });
 });
 
 router.post('/get-enquiry', function(req, res) {
