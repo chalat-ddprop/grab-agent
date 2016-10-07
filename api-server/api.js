@@ -53,7 +53,7 @@ router.get('/create-enquiry', function(req, res) {
         }, (err, result) => {
             let doc = result.ops[0];
             let payload = {
-                'key' : doc._id
+                'key' : doc._id,
                 'timestamp' : doc.timestamp
             };
 
