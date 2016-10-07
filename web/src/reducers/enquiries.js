@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const enquiries = (state = [], action) => {
   switch (action.type) {
     case 'ADD_ENQUIRY':
@@ -11,7 +13,7 @@ const enquiries = (state = [], action) => {
 
     case 'REMOVE_ENQUIRY':
       return _.filter(state, (enquiry) => {
-        return action.key != enquiry.key;
+        return action.key !== enquiry.key;
       });
 
     default:

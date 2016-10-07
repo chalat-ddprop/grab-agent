@@ -27,17 +27,12 @@ export const createEnquiry = (userProfile, conditions) => {
         return response.json()
       })
       .then((json) => {
-        dispatch({
-          type: 'SAVED'
-        });
+        dispatch(saved());
 
         dispatch(addEnquiry(json, conditions));
       })
 
-    return {
-      type: 'SAVING',
-      xhr: xhr
-    }
+    return saving(xhr)
   }
 }
 
