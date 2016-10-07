@@ -141,7 +141,7 @@ class SearchForm extends Component {
             <RaisedButton
               label="Create Request"
               secondary={ true }
-              disabled={ this.props.saving || !this.props.listingType || !this.props.propertyType }
+              disabled={ this.props.saving || !this.props.conditions.listingType || !this.props.conditions.propertyType }
               onTouchTap={ this.props.onCreateEnquiry }
             />
           </List>
