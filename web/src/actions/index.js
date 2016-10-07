@@ -14,9 +14,9 @@ export const updateUserProfile = (key, value) => {
   }
 }
 
-export const createEnquiry = () => {
+export const createEnquiry = (userProfile, conditions) => {
   return (dispatch, getState, { enquiryService }) => {
-    let { apiConnection, userProfile, conditions } = getState();
+    let { apiConnection } = getState();
 
     if (apiConnection.xhr) {
       apiConnection.xhr.abort();
