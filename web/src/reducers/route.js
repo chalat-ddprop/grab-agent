@@ -1,4 +1,9 @@
-const route = (state, action) => {
+let initialData = {
+  page: 'home',
+  id: '',
+}
+
+const route = (state = initialData, action) => {
   switch (action.type) {
     case 'CHANGE_PAGE':
       return {
@@ -7,10 +12,7 @@ const route = (state, action) => {
       }
 
     default:
-      return {
-        page: 'home',
-        id: ''
-      }
+      return state
   }
 }
 
