@@ -4,8 +4,10 @@ const socket = (state = { connected: false }, action) => {
       return { connected: true };
 
     case 'DISCONNECT':
-    default:
       return { connected: false };
+
+    default:
+      return state;
   }
 }
 
