@@ -30,6 +30,11 @@ class App extends Component {
 
   componentWillMount() {
     this.socketService.connect(this.props.onConnected, this.props.onDisconnected)
+
+    var gmap = document.createElement('script');
+    gmap.setAttribute('src', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyC3nELX2pb92oNoCtQWqvazzngLwwuk1TA');
+    gmap.onload = this.props.onGmapLoaded;
+    document.body.appendChild(gmap);
   }
 
   openSocketMessage() {
@@ -76,6 +81,10 @@ const mapDispatchToProps = (dispatch) => {
 
     closeSocketMessage: () => {
       dispatch({ type: 'CLOSE_POPUP' })
+    },
+
+    onGmapLoaded: () => {
+      dispatch({ type: 'SET_GMAP', google: window.google })
     }
   }
 }

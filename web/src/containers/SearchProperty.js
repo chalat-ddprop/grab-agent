@@ -99,6 +99,14 @@ class SearchForm extends Component {
           <Divider />
           <List>
             <Subheader>Options you need</Subheader>
+            <ListItem primaryText="Location" disabled={ true }/>
+            <ListItem disabled={ true }>
+              <RaisedButton
+                href="/#/location"
+                label="Select Location from Map"
+              />
+            </ListItem>
+
             <ListItem primaryText="No. of Bedroom" disabled={ true }/>
             <ListItem disabled={ true }>
               { this.conditionComponents.bedroom }
@@ -139,7 +147,7 @@ class SearchForm extends Component {
 
           <List className="center">
             <RaisedButton
-              label="Create Request"
+              label="Find Agent"
               secondary={ true }
               disabled={ this.props.saving || !this.props.conditions.listingType || !this.props.conditions.propertyType }
               onTouchTap={ this.props.onCreateEnquiry }

@@ -16,7 +16,13 @@ const conditions = (state = initialState, action) => {
     case 'UPDATE_CONDITION':
       return Object.assign({}, state, {
         [action.key]: action.value
-      })
+      });
+
+    case 'UPDATE_CONDITION_POSITION':
+      return Object.assign({}, state, {
+        lat: action.lat,
+        lng: action.lng,
+      });
 
     default:
       return state
