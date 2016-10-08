@@ -18,6 +18,7 @@ socket.on('disconnect', function() {
 
 // init cmongodb
 var MongoClient = require('mongodb').MongoClient
+  , ObjectID = require('mongodb').ObjectID
   , assert = require('assert');
 
 // Connection URL
@@ -49,6 +50,10 @@ router.post('/create-enquiry', function(req, res) {
     dbConnection
         .collection(mongoCollectionName)
         .insertOne({
+            'conditions': req.body.conditions,
+            'userProfile': req.body.userProfile,
+            'agents': [],
+            'status': "OPEN",
             'timestamp' : new Date()
         }, (err, result) => {
             let doc = result.ops[0];
@@ -58,18 +63,24 @@ router.post('/create-enquiry', function(req, res) {
             };
 
             socket.emit('create_enquiry', payload);
+            console.log('Created Enquiry: ' + payload.key);
 
             res.json({ enquiryKey: payload.key, enquiryData: payload, status: 0 });
         })
     ;
 });
 
-router.get('/get-enquiry', function(req, res) {
-	res.json(db[req.query.key]);
+router.post('/get-enquiry', function(req, res) {
+  let enquiry = dbConnection.collection(mongoCollectionName).find({_id: ObjectID(req.body.key)}, (err, result) => {
+    result.toArray((err, arr) => {
+      console.log(arr);
+      res.json(arr);
+    })
+  });
 });
 
-router.get('/get-enquiries', function(req, res) {
-	res.json(db);
+router.post('/get-enquiries', function(req, res) {
+	res.json(dbConnection);
 });
 
 router.post('/agent-typing', function(req, res) {
@@ -78,13 +89,13 @@ router.post('/agent-typing', function(req, res) {
 })
 
 router.post('/agent-response', function(req, res) {
-	db[req.body.key].enquiryData = req.body;
+	dbConnection[req.body.key].enquiryData = req.body;
 	socket.emit('response', req.body);
 	res.json();
 })
 
 router.post('/agent-cancel', function(req, res) {
-	delete db[req.body.key];
+	delete dbConnection[req.body.key];
 	socket.emit('cancel', req.body);
 	res.json();
 })
