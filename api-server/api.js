@@ -45,7 +45,7 @@ router.get('/', function(req, res) {
 	res.json({ message: "Server is up and running" });
 });
 
-router.get('/create-enquiry', function(req, res) {
+router.post('/create-enquiry', function(req, res) {
     dbConnection
         .collection(mongoCollectionName)
         .insertOne({
@@ -72,18 +72,18 @@ router.get('/get-enquiries', function(req, res) {
 	res.json(db);
 });
 
-router.post('/agent_typing', function(req, res) {
+router.post('/agent-typing', function(req, res) {
 	socket.emit('typing', req.body);
 	res.json();
 })
 
-router.post('/agent_response', function(req, res) {
+router.post('/agent-response', function(req, res) {
 	db[req.body.key].enquiryData = req.body;
 	socket.emit('response', req.body);
 	res.json();
 })
 
-router.post('/agent_cancel', function(req, res) {
+router.post('/agent-cancel', function(req, res) {
 	delete db[req.body.key];
 	socket.emit('cancel', req.body);
 	res.json();
