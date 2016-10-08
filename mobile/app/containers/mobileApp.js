@@ -66,7 +66,6 @@ class MobileApp extends Component {
       this.refresh();
       this.props.onReset();
     });
-    // this.socket.emit('cancel', { item: item });
   }
 
   render() {
