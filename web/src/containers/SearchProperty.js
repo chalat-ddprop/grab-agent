@@ -86,12 +86,12 @@ class SearchForm extends Component {
           <Divider />
           <List>
             <Subheader>What are you looking for</Subheader>
-            <ListItem primaryText="Listing Type" disabled={ true }/>
+            <ListItem primaryText="Listing Type *" disabled={ true }/>
             <ListItem disabled={ true }>
               { this.conditionComponents.listingType }
             </ListItem>
 
-            <ListItem primaryText="Property Type" disabled={ true }/>
+            <ListItem primaryText="Property Type *" disabled={ true }/>
             <ListItem disabled={ true }>
               { this.conditionComponents.propertyType }
             </ListItem>
@@ -99,10 +99,11 @@ class SearchForm extends Component {
           <Divider />
           <List>
             <Subheader>Options you need</Subheader>
-            <ListItem primaryText="Location" disabled={ true }/>
+            <ListItem primaryText="Location *" disabled={ true }/>
             <ListItem disabled={ true }>
               <RaisedButton
-                label="Select Location from Map"
+                label={ !this.props.conditions.lat || !this.props.conditions.lng ? "Select Location from Map" : "Edit Location" }
+                primary={ this.props.conditions.lat && this.props.conditions.lng }
                 onTouchTap={ this.props.onOpenMap }
               />
             </ListItem>
@@ -149,7 +150,10 @@ class SearchForm extends Component {
             <RaisedButton
               label="Find Agent"
               secondary={ true }
-              disabled={ this.props.saving || !this.props.conditions.listingType || !this.props.conditions.propertyType }
+              disabled={
+                this.props.saving
+                || !this.props.conditions.listingType || !this.props.conditions.propertyType
+                || !this.props.conditions.lat || !this.props.conditions.lng }
               onTouchTap={ this.props.onCreateEnquiry }
             />
           </List>
