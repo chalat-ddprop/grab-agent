@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { updateConditionPosition, updateMapCenter, changeState } from '../actions';
+import { updateConditionPosition, updateMapCenter, changeState, loading, loaded } from '../actions';
 import { Map } from 'google-maps-react';
 import Marker from '../components/Marker';
+import LoadingBar from '../components/LoadingBar';
 import FontIcon from 'material-ui/FontIcon';
 import FloatingTopRightButton from '../components/FloatingTopRightButton';
 
@@ -24,6 +25,8 @@ class Location extends Component {
 
     return (
       <div>
+        <LoadingBar display={ this.props.loading } />
+
         <Map google={ this.props.google } zoom={ 14 }
              center={ this.props.center.lat && this.props.center.lng ? center : null }
              onDragend={ this.props.onCenterMoved }
@@ -50,6 +53,7 @@ const mapStateToProps = (state) => {
     center: state.gmap.center,
     lat: state.conditions.lat,
     lng: state.conditions.lng,
+    loading: state.apiConnection.loading,
   }
 }
 
@@ -65,10 +69,12 @@ const mapDispatchToProps = (dispatch) => {
 
     onLocatePosition: () => {
       if (navigator.geolocation) {
+        dispatch(loading());
         navigator.geolocation.getCurrentPosition((pos) => {
           let { coords } = pos;
           dispatch(updateMapCenter(coords.latitude, coords.longitude));
           dispatch(updateConditionPosition(coords.latitude, coords.longitude));
+          dispatch(loaded());
         });
       }
     },
