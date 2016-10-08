@@ -86,6 +86,7 @@ class SearchForm extends Component {
           <Divider />
           <List>
             <Subheader>What are you looking for</Subheader>
+
             <ListItem primaryText="Listing Type *" disabled={ true }/>
             <ListItem disabled={ true }>
               { this.conditionComponents.listingType }
@@ -95,18 +96,19 @@ class SearchForm extends Component {
             <ListItem disabled={ true }>
               { this.conditionComponents.propertyType }
             </ListItem>
-          </List>
-          <Divider />
-          <List>
-            <Subheader>Options you need</Subheader>
+
             <ListItem primaryText="Location *" disabled={ true }/>
             <ListItem disabled={ true }>
               <RaisedButton
                 label={ !this.props.conditions.lat || !this.props.conditions.lng ? "Select Location from Map" : "Edit Location" }
-                primary={ this.props.conditions.lat && this.props.conditions.lng }
+                primary={ !!(this.props.conditions.lat && this.props.conditions.lng) }
                 onTouchTap={ this.props.onOpenMap }
               />
             </ListItem>
+          </List>
+          <Divider />
+          <List>
+            <Subheader>Options you need</Subheader>
 
             <ListItem primaryText="No. of Bedroom" disabled={ true }/>
             <ListItem disabled={ true }>
@@ -154,7 +156,7 @@ class SearchForm extends Component {
                 this.props.saving
                 || !this.props.conditions.listingType || !this.props.conditions.propertyType
                 || !this.props.conditions.lat || !this.props.conditions.lng }
-              onTouchTap={ this.props.onCreateEnquiry }
+              onTouchTap={ this.props.onCreateEnquiry.bind(this, this.props.userProfile, this.props.conditions) }
             />
           </List>
       </div>
@@ -183,6 +185,7 @@ const mapDispatchToProps = (dispatch) => {
 
     onCreateEnquiry: (userProfile, conditions) => {
       dispatch(createEnquiry(userProfile, conditions))
+      window.location.hash = '/request-agent';
     }
   }
 }

@@ -22,6 +22,12 @@ class EnquiryService {
       conditions,
     })
   }
+
+  getEnquiry(enquiryKey) {
+    return this.post(`${this.url}/api/get-enquiry`, {
+      key: enquiryKey,
+    })
+  }
 }
 
 export default EnquiryService

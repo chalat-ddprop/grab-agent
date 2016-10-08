@@ -15,3 +15,7 @@ body {
 .right {
   text-align: right;
 }
+
+.compact-list {
+  padding: 40px;
+}

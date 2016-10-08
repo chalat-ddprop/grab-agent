@@ -65,12 +65,19 @@ export const changeState = (state) => {
   }
 }
 
-export const addEnquiry = (payload, conditions) => {
+export const addEnquiry = (enquiryKey, enquiryData) => {
   return {
     type: 'ADD_ENQUIRY',
-    key: payload.key,
-    timestamp: payload.timestamp,
-    conditions: conditions,
+    key: enquiryKey,
+    enquiryData: enquiryData,
+  }
+}
+
+export const updateEnquiry = (enquiryKey, enquiryData) => {
+  return {
+    type: 'UPDATE_ENQUIRY',
+    key: enquiryKey,
+    enquiryData: enquiryData,
   }
 }
 
@@ -88,10 +95,32 @@ export const createEnquiry = (userProfile, conditions) => {
       })
       .then((json) => {
         dispatch(saved());
-
-        dispatch(addEnquiry(json, conditions));
+        // dispatch(addEnquiry(json.enquiryKey, json.enquiryData));
+        dispatch(updateEnquiry(json.enquiryKey, json.enquiryData));
       })
 
     return saving(xhr)
+  }
+}
+
+export const getEnquiry = (enquiryKey) => {
+  return (dispatch, getState, { enquiryService }) => {
+    let { apiConnection } = getState();
+
+    if (apiConnection.xhr) {
+      apiConnection.xhr.abort();
+    }
+
+    let xhr = enquiryService.getEnquiry(enquiryKey)
+      .then((response) => {
+        return response.json()
+      })
+      .then((json) => {
+        let enquiry = json[0];
+        dispatch(loaded());
+        dispatch(updateEnquiry(enquiry.key, enquiry))
+      })
+
+    return loading(xhr)
   }
 }

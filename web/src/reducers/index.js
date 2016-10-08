@@ -5,7 +5,7 @@ import gmap from './gmap'
 import apiConnection from './apiConnection'
 import userProfile from './userProfile'
 import conditions from './conditions'
-import enquiries from './enquiries'
+import enquiry from './enquiry'
 
 const agentSearchApp = combineReducers({
   socket,
@@ -14,7 +14,7 @@ const agentSearchApp = combineReducers({
   apiConnection,
   userProfile,
   conditions,
-  enquiries,
+  enquiry,
 })
 
 export default agentSearchApp
