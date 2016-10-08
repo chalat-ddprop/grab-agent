@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Home from './Home'
 import Enquiry from './Enquiry'
-import Location from './Location'
 import RequestAgent from './RequestAgent';
 import NoMatch from './NoMatch';
 
@@ -21,9 +20,6 @@ class AppRouter extends Component {
 
       case 'enquiry':
         return <Enquiry/>
-
-      case 'location':
-        return <Location/>
 
       case 'request-agent':
         return <RequestAgent/>

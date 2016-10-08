@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { updateCondition, createEnquiry } from '../actions';
+import { updateCondition, createEnquiry, changeState } from '../actions';
 import _ from 'lodash';
 import { SearchConditions } from '../constants/search';
 import { List, ListItem } from 'material-ui/List';
@@ -102,8 +102,8 @@ class SearchForm extends Component {
             <ListItem primaryText="Location" disabled={ true }/>
             <ListItem disabled={ true }>
               <RaisedButton
-                href="/#/location"
                 label="Select Location from Map"
+                onTouchTap={ this.props.onOpenMap }
               />
             </ListItem>
 
@@ -171,6 +171,10 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onUpdateCondition: (key, value) => {
       dispatch(updateCondition(key, value))
+    },
+
+    onOpenMap: () => {
+      dispatch(changeState('map'))
     },
 
     onCreateEnquiry: (userProfile, conditions) => {

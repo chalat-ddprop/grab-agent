@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { updateConditionPosition, updateMapCenter } from '../actions';
+import { updateConditionPosition, updateMapCenter, changeState } from '../actions';
 import { Map } from 'google-maps-react';
 import Marker from '../components/Marker';
 import FontIcon from 'material-ui/FontIcon';
@@ -74,7 +74,7 @@ const mapDispatchToProps = (dispatch) => {
     },
 
     onDone: () => {
-      window.location.hash = '/enquiry';
+      dispatch(changeState(null));
     }
   }
 }

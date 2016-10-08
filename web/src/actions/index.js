@@ -58,6 +58,13 @@ export const loaded = () => {
   }
 }
 
+export const changeState = (state) => {
+  return {
+    type: 'CHANGE_STATE',
+    state: state,
+  }
+}
+
 export const addEnquiry = (payload, conditions) => {
   return {
     type: 'ADD_ENQUIRY',
