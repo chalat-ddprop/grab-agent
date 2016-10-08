@@ -28,6 +28,7 @@ class RequestList extends Component {
     return (
       <ListView style={styles.list}
         dataSource={this.state.dataSource}
+        enableEmptySections={true}
         renderRow={(rowData) => <RequestListItem item={rowData} onSelect={this.props.onSelect} />}
       />
     );

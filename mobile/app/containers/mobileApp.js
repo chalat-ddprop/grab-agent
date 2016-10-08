@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, AlertIOS } from 'react-native';
+import { StyleSheet, View, Text, Image } from 'react-native';
 import { bindActionCreators } from 'redux';
 import RequestList from '../components/requestList';
 import RequestDetail from '../components/requestDetail';
@@ -37,7 +37,6 @@ class MobileApp extends Component {
       },
       body: JSON.stringify({ key: item.key })
     });
-    //this.socket.emit('typing', { item: item });
   }
 
   submit(item, message) {
@@ -50,9 +49,9 @@ class MobileApp extends Component {
       },
       body: JSON.stringify(item)
     }).then(() => {
+      this.refresh();
       this.props.onReset();
     });
-    //this.socket.emit('response', { item: item });
   }
 
   cancel(item) {
@@ -64,6 +63,7 @@ class MobileApp extends Component {
       },
       body: JSON.stringify({ key: item.key })
     }).then(() => {
+      this.refresh();
       this.props.onReset();
     });
     // this.socket.emit('cancel', { item: item });
@@ -72,8 +72,9 @@ class MobileApp extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View>
-
+        <View style={styles.title}>
+          <Image source={require('../../img/icon-agenanswer.png')} style={styles.titleLogo} />
+          <Text style={styles.titleText}>GrabAgentMobile</Text>
         </View>
 
         <View>
@@ -110,6 +111,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
+  },
+  title: {
+    flexDirection: 'row',
+    marginTop: 60,
+    alignItems: 'center',
+  },
+  titleLogo: {
+    width: 60,
+    height: 60,
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#CC2200',
+    marginLeft: 12,
+    marginTop: 6,
   },
   status: {
     textAlign: 'center',
