@@ -1,20 +1,19 @@
 'use strict';
 
+let imports = {
+    'SDKHttpClient' : require('./lib/SDKHttpClient.class.js'),
+};
+
 var express = require('express'),
     cors = require('cors'),
     bodyParser = require('body-parser');
 
 var apiPort = 4300,
-		socketPort = 3700;
+    socketPort = 3700;
+let apiAccessToken = process.env['PG_ACCESS_TOKEN'] || '';
 
-// init socket.io connection
-var socket = require('socket.io-client')('http://localhost:' + socketPort);
-socket.on('connect', function() {
-	console.log("Socket server connected on " + socketPort);
-});
-socket.on('disconnect', function() {
-	console.log("Socket server disconnected on " + socketPort);
-});
+let consumerSockets = {};
+let agentSockets = {};
 
 let mockAgents = [
   {
@@ -41,7 +40,7 @@ let mockAgents = [
   },
 ]
 
-// init cmongodb
+// init mongodb
 var MongoClient = require('mongodb').MongoClient
   , ObjectID = require('mongodb').ObjectID
   , assert = require('assert');
@@ -60,6 +59,16 @@ MongoClient.connect(mongoUrl, function(err, db) {
     dbConnection = db;
 });
 
+// init sdks
+let listingSdk = new imports.SDKHttpClient({
+    "scheme" : "https",
+    "host" : "api.staging.propertyguru.com",
+});
+let agentSdk = new imports.SDKHttpClient({
+    "scheme" : "https",
+    "host" : "api.staging.propertyguru.com",
+});
+
 // init express
 var app = express()
 app.use(cors());
@@ -71,7 +80,7 @@ router.get('/', function(req, res) {
 	res.json({ message: "Server is up and running" });
 });
 
-router.post('/create-enquiry', function(req, res) {
+router.use('/create-enquiry', function(req, res) {
     let enquiryData = {
         'conditions': req.body.conditions,
         'userProfile': req.body.userProfile,
@@ -88,14 +97,77 @@ router.post('/create-enquiry', function(req, res) {
                 'key' : doc._id,
                 'timestamp' : doc.timestamp
             };
+            // notify agents - if any
+            let socketAgentIds = Object.keys(agentSockets);
+            let agentIds = [];
 
-            socket.emit('create_enquiry', payload);
-            console.log('Created Enquiry: ' + payload.key);
-            console.log(enquiryData);
+            if (agentIds.length > 0) {
+                let filters = {
+                    'listing_type' : (req.body.conditions.listingType || '').toLowerCase(),
+                    'property_type_code' : (req.body.conditions.propertyType || '').toUpperCase(),
+                    'center_lat' : parseFloat(req.body.conditions.lat) || 0,
+                    'center_long' : parseFloat(req.body.conditions.lng) || 0,
+                    'radius' : parseFloat(req.body.conditions.radius) || 0,
 
-            res.json({ enquiryKey: payload.key, enquiryData: enquiryData, status: 0 });
-        })
-    ;
+                    'access_token' : apiAccessToken,
+                    'region' : 'th',
+                    'status_code' : 'ACT',
+                    'agent_id' : agentIds,
+                    'limit' : 100,
+                };
+
+                let floorSizeMin = parseFloat(req.body.conditions.floorSizeMin) || -1;
+                if (floorSizeMin >= 0 ) {
+                    filters['minsize'] = floorSizeMin;
+                }
+
+                let floorSizeMax = parseFloat(req.body.conditions.floorSizeMax) || -1;
+                if (floorSizeMax >= 0 ) {
+                    filters['maxsize'] = floorSizeMax;
+                }
+
+                let beds = parseInt(req.body.conditions.bedroom);
+                if (!isNaN(beds)) {
+                    filters['beds'] = beds;
+                }
+
+                let baths = parseInt(req.body.conditions.bathroom);
+                if (!isNaN(baths)) {
+                    filters['baths'] = baths;
+                }
+
+                let furnishing = req.body.conditions.furnishing || '';
+                if (furnishing != '') {
+                    filters['furnishing'] = furnishing;
+                }
+
+                listingSdk.request('/v1/listings', (err, response) => {
+                    if (err) {
+                        console.log(err);
+                        throw new Error('noooooooo');
+                    }
+
+                    let listings = response.listings || [];
+                    for (let listing of listings) {
+                        let agentId = listing['agent'] ? listing['agent']['id'] : null;
+                        if (agentId) {
+                            agentIds[agentId] = 1
+                        }
+                    }
+                    agentIds = Object.keys(agentIds);
+                    console.log("Agent ids");
+                    console.log(agentIds);
+
+                    for (let agentId of agentIds) {
+                        agentSockets.emit('consumer_enquiry', payload);
+                    }
+
+                    res.json({ enquiryKey: payload.key, enquiryData: payload, agentIds: agentIds, status: 0 });
+                });
+            } else {
+                res.json({ enquiryKey: payload.key, enquiryData: payload, agentIds: agentIds, status: 0 });
+            }
+        });
 });
 
 router.post('/get-enquiry', function(req, res) {
@@ -108,7 +180,7 @@ router.post('/get-enquiry', function(req, res) {
 });
 
 router.post('/get-enquiries', function(req, res) {
-	res.json(dbConnection);
+    res.json(dbConnection);
 });
 
 router.post('/agent-typing', function(req, res) {
@@ -137,10 +209,68 @@ router.post('/consumer-deny', function(req, res) {
 })
 
 router.post('/cancel-enquiry', function(req, res) {
-  res.json();
+    res.json();
 })
 
 app.use('/api', router);
 app.listen(apiPort);
 
-console.log('Listening on port ' + apiPort);
+console.log('App listening on port ' + apiPort);
+
+// socket.io
+let socketApp = express();
+var io = require('socket.io').listen(socketApp.listen(socketPort));
+console.log('Socket.io listening on port ' + socketPort);
+
+io.sockets.on('connection', function (socket) {
+    console.log("Client socket connected");
+    /**
+     * Consumer events
+     */
+    socket.on('create_enquiry', function(enquiryData) {
+        consumerSockets[enquiryData.key] = socket;
+        io.sockets.emit('consumer_enquiry', enquiryData);
+        console.log('all sockets emit consumer_enquiry');
+    });
+    socket.on('accept', function(data) {
+        var sock = agentSockets[data.agentId];
+        sock.emit('agent_deal', data.enquiryData);
+        console.log('mapped socket emit agent_deal');
+
+        io.sockets.emit('consumer_deal', data.enquiryData);
+        console.log('all sockets emit consumer_deal');
+    });
+
+    /**
+     * Agent events
+     */
+    socket.on('typing', function(data) {
+        var sock = consumerSockets[data.enquiryData.key];
+        sock.emit('agent_typing', {
+            'enquiryData' : data.enquiryData,
+            'agentId' : data.agentId
+        });
+        console.log('mapped socket emit agent_typing');
+    });
+    socket.on('response', function(data) {
+        var sock = consumerSockets[data.enquiryData.key];
+        sock.emit('agent_response', {
+            'enquiryData' : data.enquiryData,
+            'agentId' : data.agentId,
+            'message' : data.message
+        });
+        console.log('mapped socket emit agent_response');
+    });
+    socket.on('login', function(data) {
+        agentSockets[data.agentId] = socket;
+        console.log('login');
+    });
+
+/*
+    socket.on('cancel', function(data) {
+        var sock = mappingTable[getKey(data)];
+        sock.emit('agent_cancel', data);
+        console.log('mapped socket emit agent_cancel');
+    });
+*/
+});
