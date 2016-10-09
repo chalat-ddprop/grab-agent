@@ -3,7 +3,7 @@ const initialState = {
   propertyType: 'CONDO',
   lat: null,
   lng: null,
-  radius: 1000, // 1 km
+  radius: 10000, // 1 km
   bedroom: null,
   bathroom: null,
   floorSizeMin: null,

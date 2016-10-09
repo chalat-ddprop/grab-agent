@@ -20,6 +20,10 @@ class AgentSocketService {
     this.socket.on('client_mapped', cb);
   }
 
+  onAgentsNotify(cb) {
+    this.socket.on('agents_notify', cb);
+  }
+
   onAgentTyping(cb) {
     this.socket.on('agent_typing', cb);
   }

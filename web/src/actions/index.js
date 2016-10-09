@@ -81,9 +81,24 @@ export const updateEnquiry = (enquiryKey, enquiryData) => {
   }
 }
 
+export const updateEnquiryStatus = (status) => {
+  return {
+    type: 'UPDATE_ENQUIRY_STATUS',
+    status: status,
+  }
+}
+
 export const clearEnquiry = () => {
   return {
     type: 'CLEAR_ENQUIRY',
+  }
+}
+
+export const agentsNotify = (enquiryKey, agents) => {
+  return {
+    type: 'AGENTS_NOTIFY',
+    enquiryKey: enquiryKey,
+    agents: agents,
   }
 }
 
@@ -126,7 +141,7 @@ export const createEnquiry = (userProfile, conditions) => {
       apiConnection.xhr.abort();
     }
 
-    let xhr = enquiryService.createEnquiry(userProfile, conditions)
+    let xhr = enquiryService.createEnquiry(userProfile.clientId, userProfile, conditions)
       .then((response) => {
         return response.json()
       })
@@ -142,13 +157,13 @@ export const createEnquiry = (userProfile, conditions) => {
 
 export const getEnquiry = (enquiryKey) => {
   return (dispatch, getState, { enquiryService }) => {
-    let { apiConnection } = getState();
+    let { apiConnection, userProfile } = getState();
 
     if (apiConnection.xhr) {
       apiConnection.xhr.abort();
     }
 
-    let xhr = enquiryService.getEnquiry(enquiryKey)
+    let xhr = enquiryService.getEnquiry(userProfile.clientId, enquiryKey)
       .then((response) => {
         return response.json()
       })
@@ -166,13 +181,13 @@ export const cancelEnquiry = (enquiryKey) => {
   return (dispatch, getState, { enquiryService }) => {
     dispatch(clearEnquiry())
 
-    let { apiConnection } = getState();
+    let { apiConnection, userProfile } = getState();
 
     if (apiConnection.xhr) {
       apiConnection.xhr.abort();
     }
 
-    let xhr = enquiryService.cancelEnquiry(enquiryKey)
+    let xhr = enquiryService.cancelEnquiry(userProfile.clientId, enquiryKey)
       .then((response) => {
         return response.json()
       })
@@ -188,13 +203,13 @@ export const acceptAgent = (enquiryKey, agentId) => {
   return (dispatch, getState, { enquiryService }) => {
     dispatch(pickAgent(agentId));
 
-    let { apiConnection } = getState();
+    let { apiConnection, userProfile } = getState();
 
     if (apiConnection.xhr) {
       apiConnection.xhr.abort();
     }
 
-    let xhr = enquiryService.acceptAgent(enquiryKey, agentId)
+    let xhr = enquiryService.acceptAgent(userProfile.clientId, enquiryKey, agentId)
       .then((response) => {
         return response.json()
       })
@@ -211,13 +226,13 @@ export const denyAgent = (enquiryKey, agentId) => {
   return (dispatch, getState, { enquiryService }) => {
     dispatch(removeAgent(agentId));
 
-    let { apiConnection } = getState();
+    let { apiConnection, userProfile } = getState();
 
     if (apiConnection.xhr) {
       apiConnection.xhr.abort();
     }
 
-    let xhr = enquiryService.denyAgent(enquiryKey)
+    let xhr = enquiryService.denyAgent(userProfile.clientId, enquiryKey)
       .then((response) => {
         return response.json()
       })

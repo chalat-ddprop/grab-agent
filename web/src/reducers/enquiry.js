@@ -25,6 +25,16 @@ const enquiry = (state = initialData, action) => {
           ...action.enquiryData
         })
 
+    case 'AGENTS_NOTIFY':
+      return Object.assign({}, state, {
+        agents: action.agents.map((agent) => {
+          return {
+            ...agent,
+            status: 'REQUESTING',
+          }
+        })
+      })
+
     case 'CLEAR_ENQUIRY':
       return Object.assign({}, initialData)
 
@@ -41,6 +51,11 @@ const enquiry = (state = initialData, action) => {
         agents: state.agents.filter((agent) => {
           return agent.agentId !== action.agentId
         })
+      })
+
+    case 'UPDATE_ENQUIRY_STATUS':
+      return Object.assign({}, state, {
+        status: action.status,
       })
 
     default:

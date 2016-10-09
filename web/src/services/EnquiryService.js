@@ -19,34 +19,39 @@ class EnquiryService {
     })
   }
 
-  createEnquiry(userProfile, conditions) {
+  createEnquiry(clientId, userProfile, conditions) {
     return this.post(`${this.url}/api/create-enquiry`, {
+      clientId,
       userProfile,
       conditions,
     })
   }
 
-  getEnquiry(enquiryKey) {
+  getEnquiry(clientId, enquiryKey) {
     return this.post(`${this.url}/api/get-enquiry`, {
+      clientId,
       key: enquiryKey,
     })
   }
 
-  cancelEnquiry(enquiryKey) {
+  cancelEnquiry(clientId, enquiryKey) {
     return this.post(`${this.url}/api/cancel-enquiry`, {
+      clientId,
       key: enquiryKey,
     })
   }
 
-  acceptAgent(enquiryKey, agentId) {
+  acceptAgent(clientId, enquiryKey, agentId) {
     return this.post(`${this.url}/api/consumer-accept`, {
+      clientId,
       key: enquiryKey,
       agentId: agentId,
     })
   }
 
-  denyAgent(enquiryKey, agentId) {
+  denyAgent(clientId, enquiryKey, agentId) {
     return this.post(`${this.url}/api/consumer-deny`, {
+      clientId,
       key: enquiryKey,
       agentId: agentId,
     })

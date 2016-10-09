@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { agentTyping, agentResponse } from './actions';
+import { agentsNotify, agentTyping, agentResponse, updateEnquiryStatus } from './actions';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { red600 } from 'material-ui/styles/colors';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -32,6 +32,7 @@ class App extends Component {
   componentWillMount() {
     this.socketService.connect(this.props.onConnected, this.props.onDisconnected)
     this.socketService.onClientMapped(this.props.onClientMapped);
+    this.socketService.onAgentsNotify(this.props.onAgentsNotify);
     this.socketService.onAgentTyping(this.props.onAgentTyping);
     this.socketService.onAgentResponse(this.props.onAgentResponse);
 
@@ -87,9 +88,16 @@ const mapDispatchToProps = (dispatch) => {
       dispatch({ type: 'CLOSE_POPUP' })
     },
 
-    onClientMapped: (data) => {
-      console.log(data);
-      dispatch({ type: 'CLIENT_MAPPED', clientId: data.clientId })
+    onClientMapped: (clientId) => {
+      dispatch({ type: 'CLIENT_MAPPED', clientId: clientId })
+    },
+
+    onAgentsNotify: (data) => {
+      if (data.agents.length) {
+        dispatch(agentsNotify(data.enquiryKey, data.agents))
+      } else {
+        dispatch(updateEnquiryStatus('INVALID'))
+      }
     },
 
     onAgentTyping: (data) => {
