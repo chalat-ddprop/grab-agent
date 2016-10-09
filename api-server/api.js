@@ -113,7 +113,7 @@ router.use('/create-enquiry', function(req, res) {
                     'property_type_code' : (req.body.conditions.propertyType || '').toUpperCase(),
                     'center_lat' : parseFloat(req.body.conditions.lat) || 0,
                     'center_long' : parseFloat(req.body.conditions.lng) || 0,
-                    'radius' : parseFloat(req.body.conditions.radius) || 0,
+                    'distance' : parseFloat(req.body.conditions.radius) || 0,
 
                     'access_token' : apiAccessToken,
                     'region' : region,
