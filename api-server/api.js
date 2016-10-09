@@ -89,6 +89,9 @@ router.use('/create-enquiry', function(req, res) {
         'timestamp' : new Date()
     };
 
+    console.log("Received client enquiry");
+    console.log(enquiryData);
+
     dbConnection
         .collection(mongoCollectionName)
         .insertOne(enquiryData, (err, result) => {
@@ -99,9 +102,13 @@ router.use('/create-enquiry', function(req, res) {
             };
             // notify agents - if any
             let socketAgentIds = Object.keys(agentSockets);
+            socketAgentIds = [
+                1921898
+            ];
             let agentIds = [];
 
-            if (agentIds.length > 0) {
+            if (socketAgentIds.length > 0) {
+                console.log(`Enquiry ${payload.key}: Filtering based on user filters and logged in agent ids (${socketAgentIds.length})`);
                 let filters = {
                     'listing_type' : (req.body.conditions.listingType || '').toLowerCase(),
                     'property_type_code' : (req.body.conditions.propertyType || '').toUpperCase(),
@@ -112,7 +119,7 @@ router.use('/create-enquiry', function(req, res) {
                     'access_token' : apiAccessToken,
                     'region' : 'th',
                     'status_code' : 'ACT',
-                    'agent_id' : agentIds,
+                    'agent_id' : socketAgentIds,
                     'limit' : 100,
                 };
 
@@ -148,6 +155,7 @@ router.use('/create-enquiry', function(req, res) {
                     }
 
                     let listings = response.listings || [];
+                    console.log(`Enquiry ${payload.key}: Got ${listings.length} listings from user request`);
                     for (let listing of listings) {
                         let agentId = listing['agent'] ? listing['agent']['id'] : null;
                         if (agentId) {
@@ -155,16 +163,22 @@ router.use('/create-enquiry', function(req, res) {
                         }
                     }
                     agentIds = Object.keys(agentIds);
-                    console.log("Agent ids");
-                    console.log(agentIds);
 
-                    for (let agentId of agentIds) {
-                        agentSockets.emit('consumer_enquiry', payload);
+                    if (agentIds.length > 0) {
+                        console.log(`Enquiry ${payload.key}: Notifying ${agentIds.length} agents`);
+                        console.log(agentIds);
+
+                        for (let agentId of agentIds) {
+                            agentSockets.emit('consumer_enquiry', payload);
+                        }
+                    } else {
+                        console.log(`Enquiry ${payload.key}: No listings found for specified filters and agents`);
                     }
 
                     res.json({ enquiryKey: payload.key, enquiryData: payload, agentIds: agentIds, status: 0 });
                 });
             } else {
+                console.log(`Enquiry ${payload.key}: No logged in agents`);
                 res.json({ enquiryKey: payload.key, enquiryData: payload, agentIds: agentIds, status: 0 });
             }
         });
