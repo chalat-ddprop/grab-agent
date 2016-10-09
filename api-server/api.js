@@ -172,7 +172,11 @@ router.use('/create-enquiry', function(req, res) {
 
                         for (let agentId of agentIds) {
                             console.log(`Enquiry ${payload.key}: Notifying agent ${agentId}`);
-                            agentSockets[agentId].emit('consumer_enquiry', payload);
+                            agentSockets[agentId].emit('consumer_enquiry', {
+                                'userProfile': req.body.userProfile,
+                                'key' : doc._id,
+                                'timestamp' : doc.timestamp,
+                            });
                         }
                     } else {
                         console.log(`Enquiry ${payload.key}: No listings found for specified filters and agents`);
