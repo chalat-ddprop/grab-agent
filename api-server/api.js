@@ -199,8 +199,8 @@ router.use('/create-enquiry', function(req, res) {
                         for (let agent of agents) {
                             agentInfo.push({
                                 'agentId' : agent['id'],
-                                'firstname' : agent['person']['firstname'],
-                                'lastname' : agent['person']['lastname'],
+                                'firstname' : agent['webUser']['person']['firstname'],
+                                'lastname' : agent['webUser']['person']['lastname'],
                                 'imageUrl' : agent['photo'][0]
                                     ||  agent['logo'][0]
                                     ||  (agent['agency'] ? agent['agency']['photo'][0] : null)
