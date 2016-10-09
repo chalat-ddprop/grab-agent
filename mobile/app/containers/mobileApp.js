@@ -14,7 +14,7 @@ import io from 'socket.io-client/socket.io';
 class MobileApp extends Component {
   componentWillMount() {
     this.socket = io('http://localhost:3700', {jsonp: false});
-    this.socket.on('connect', this.props.onSocketConnect);
+    this.socket.on('connect', this.props.onSocketConnect.bind(this, this.socket));
     this.socket.on('connect', this.login.bind(this));
     this.socket.on('disconnect', this.props.onSocketDisconnect);
     // this.socket.on('consumer_enquiry', this.refresh.bind(this));
@@ -87,7 +87,7 @@ class MobileApp extends Component {
 
   render() {
     var content;
-    if (this.props.agentProfile) {
+    // if (this.props.agentProfile) {
       if (this.props.detail.item) {
         content = <RequestDetail
           item={this.props.detail.item}
@@ -99,9 +99,9 @@ class MobileApp extends Component {
           list={this.props.list}
           onSelect={this.props.onListItemSelect} />;
       }
-    } else {
+    // } else {
       // content = <Login onLogin={this.login.bind(this)} />;
-    }
+    // }
 
     return (
       <View style={styles.container}>
@@ -172,8 +172,8 @@ export default connect(state => ({
   }),
   (dispatch) => {
     return {
-      onSocketConnect: () => {
-        return dispatch({ type: 'CONNECT' });
+      onSocketConnect: (io) => {
+        return dispatch({ type: 'CONNECT', io: io });
       },
       onSocketDisconnect: () => {
         return dispatch({ type: 'DISCONNECT' });
