@@ -213,6 +213,7 @@ router.use('/create-enquiry', function(req, res) {
 
                         // notify the client
                         allSockets[req.body.clientId].emit('agents_notify', {
+                            'enquiryKey': payload.key,
                             'agents' : agentInfo
                         });
 
