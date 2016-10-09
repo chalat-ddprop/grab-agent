@@ -128,6 +128,18 @@ router.post('/agent-cancel', function(req, res) {
 	res.json();
 })
 
+router.post('/consumer-accept', function(req, res) {
+	res.json();
+})
+
+router.post('/consumer-deny', function(req, res) {
+	res.json();
+})
+
+router.post('/cancel-enquiry', function(req, res) {
+  res.json();
+})
+
 app.use('/api', router);
 app.listen(apiPort);
 
