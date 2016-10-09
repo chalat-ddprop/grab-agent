@@ -30,7 +30,7 @@ export default class RequestDetail extends Component {
           Please return him some feedback message
         </Text>
 
-        <Image source={{uri: this.props.item.userProfile.imageUrl}} style={{width: 140, height: 140, margin: 6}} />
+        {/* <Image source={{uri: this.props.item.userProfile.imageUrl}} style={{width: 140, height: 140, margin: 6}} /> */}
         <Text style={styles.instructions}>{this.props.item.userProfile.firstname} {this.props.item.userProfile.lastname}{'\n'}</Text>
 
         <TextInput

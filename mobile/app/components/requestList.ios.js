@@ -16,7 +16,9 @@ class RequestList extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    console.log(nextProps);
     if (nextProps.list !== this.props.list) {
+      console.log('setState');
       this.setState({
         list: nextProps.list,
         dataSource: this.state.dataSource.cloneWithRows(nextProps.list)
@@ -37,10 +39,11 @@ class RequestList extends Component {
 
 class RequestListItem extends Component {
   render() {
+    console.log(this.props.item);
     return (
       <TouchableOpacity style={styles.listItem} onPress={this.props.onSelect.bind(this, this.props.item)}>
         <View style={styles.listItem_container}>
-          <Image source={{uri: this.props.item.userProfile.imageUrl}} style={{width: 64, height: 64}} />
+          {/* <Image source={{uri: this.props.item.userProfile.imageUrl}} style={{width: 64, height: 64}} /> */}
           <Text style={styles.listItem_customername}>{this.props.item.userProfile.firstname} {this.props.item.userProfile.lastname}</Text>
           <Text style={styles.listItem_timestamp}>{moment(this.props.item.timestamp).format('LT')}</Text>
         </View>
@@ -78,7 +81,10 @@ const styles = StyleSheet.create({
 });
 
 
-export default connect(state => ({
-    list: state.list
-  })
+export default connect(
+  (state) => {
+    return {
+      list: state.list
+    }
+  }
 )(RequestList);
