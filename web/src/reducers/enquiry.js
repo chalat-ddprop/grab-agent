@@ -50,6 +50,9 @@ const enquiry = (state = initialData, action) => {
           ...action.enquiryData
         })
 
+    case 'CLEAR_ENQUIRY':
+      return Object.assign({}, initialData)
+
     case 'PICK_AGENT':
       return Object.assign({}, state, {
         agents: state.agents.filter((agent) => {

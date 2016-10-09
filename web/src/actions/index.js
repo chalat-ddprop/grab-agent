@@ -81,6 +81,26 @@ export const updateEnquiry = (enquiryKey, enquiryData) => {
   }
 }
 
+export const clearEnquiry = () => {
+  return {
+    type: 'CLEAR_ENQUIRY',
+  }
+}
+
+export const pickAgent = (agentId) => {
+  return {
+    type: 'PICK_AGENT',
+    agentId: agentId,
+  }
+}
+
+export const removeAgent = (agentId) => {
+  return {
+    type: 'REMOVE_AGENT',
+    agentId: agentId,
+  }
+}
+
 export const createEnquiry = (userProfile, conditions) => {
   return (dispatch, getState, { enquiryService }) => {
     let { apiConnection } = getState();
@@ -125,17 +145,25 @@ export const getEnquiry = (enquiryKey) => {
   }
 }
 
-export const pickAgent = (agentId) => {
-  return {
-    type: 'PICK_AGENT',
-    agentId: agentId,
-  }
-}
+export const cancelEnquiry = (enquiryKey) => {
+  return (dispatch, getState, { enquiryService }) => {
+    dispatch(clearEnquiry())
 
-export const removeAgent = (agentId) => {
-  return {
-    type: 'REMOVE_AGENT',
-    agentId: agentId,
+    let { apiConnection } = getState();
+
+    if (apiConnection.xhr) {
+      apiConnection.xhr.abort();
+    }
+
+    let xhr = enquiryService.cancelEnquiry(enquiryKey)
+      .then((response) => {
+        return response.json()
+      })
+      .then((json) => {
+        dispatch(saved());
+      })
+
+    return saving(xhr)
   }
 }
 

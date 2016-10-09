@@ -29,6 +29,12 @@ class EnquiryService {
     })
   }
 
+  cancelEnquiry(enquiryKey) {
+    return this.post(`${this.url}/api/cancel-enquiry`, {
+      key: enquiryKey,
+    })
+  }
+
   acceptAgent(enquiryKey, agentId) {
     return this.post(`${this.url}/api/consumer-accept`, {
       key: enquiryKey,
