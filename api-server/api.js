@@ -16,6 +16,31 @@ socket.on('disconnect', function() {
 	console.log("Socket server disconnected on " + socketPort);
 });
 
+let mockAgents = [
+  {
+    agentId: 101,
+    firstname: 'Andrei',
+    lastname: 'Blotzu',
+    imageUrl: 'https://scontent.xx.fbcdn.net/v/t1.0-9/422665_2777709124390_659706876_n.jpg?oh=8420581225b63f4c99569c7c471478ba&oe=58A1B1B1',
+    status: 'TYPING',
+  },
+  {
+    agentId: 102,
+    firstname: 'Chalat',
+    lastname: 'Luprasit',
+    imageUrl: 'http://graph.facebook.com/694642202/picture/320',
+    status: 'RESPONSED',
+    message: "Hi! I have 5 properties you would interested.\nI can go along with you on Saturday anytime before 9pm\nLooking forward to get your response."
+  },
+  {
+    agentId: 103,
+    firstname: 'Chatchai',
+    lastname: 'Kritsetsakul',
+    imageUrl: 'https://scontent.xx.fbcdn.net/v/t1.0-9/12243281_10153676501877698_9056860850198762974_n.jpg?oh=47bd710287c476227bd46fcb4b5f5d52&oe=586480FD',
+    status: 'TYPING',
+  },
+]
+
 // init cmongodb
 var MongoClient = require('mongodb').MongoClient
   , ObjectID = require('mongodb').ObjectID
@@ -47,15 +72,17 @@ router.get('/', function(req, res) {
 });
 
 router.post('/create-enquiry', function(req, res) {
+    let enquiryData = {
+        'conditions': req.body.conditions,
+        'userProfile': req.body.userProfile,
+        'agents': mockAgents,
+        'status': "OPEN",
+        'timestamp' : new Date()
+    };
+
     dbConnection
         .collection(mongoCollectionName)
-        .insertOne({
-            'conditions': req.body.conditions,
-            'userProfile': req.body.userProfile,
-            'agents': [],
-            'status': "OPEN",
-            'timestamp' : new Date()
-        }, (err, result) => {
+        .insertOne(enquiryData, (err, result) => {
             let doc = result.ops[0];
             let payload = {
                 'key' : doc._id,
@@ -64,8 +91,9 @@ router.post('/create-enquiry', function(req, res) {
 
             socket.emit('create_enquiry', payload);
             console.log('Created Enquiry: ' + payload.key);
+            console.log(enquiryData);
 
-            res.json({ enquiryKey: payload.key, enquiryData: payload, status: 0 });
+            res.json({ enquiryKey: payload.key, enquiryData: enquiryData, status: 0 });
         })
     ;
 });
@@ -98,6 +126,18 @@ router.post('/agent-cancel', function(req, res) {
 	delete dbConnection[req.body.key];
 	socket.emit('cancel', req.body);
 	res.json();
+})
+
+router.post('/consumer-accept', function(req, res) {
+	res.json();
+})
+
+router.post('/consumer-deny', function(req, res) {
+	res.json();
+})
+
+router.post('/cancel-enquiry', function(req, res) {
+  res.json();
 })
 
 app.use('/api', router);
