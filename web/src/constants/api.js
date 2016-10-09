@@ -1,5 +1,5 @@
 export const api = {
   scheme: 'http',
-  host: 'grabagent.guruestate.com',
+  host: 'localhost',
   port: 4300,
 }

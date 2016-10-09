@@ -13,7 +13,9 @@ var apiPort = 4300,
 let apiAccessToken = process.env['PG_ACCESS_TOKEN'] || '';
 
 let consumerSockets = {};
+let allSockets = {};
 let agentSockets = {};
+let region = 'sg';
 
 let mockAgents = [
   {
@@ -89,6 +91,9 @@ router.use('/create-enquiry', function(req, res) {
         'timestamp' : new Date()
     };
 
+    console.log("Received client enquiry");
+    console.log(enquiryData);
+
     dbConnection
         .collection(mongoCollectionName)
         .insertOne(enquiryData, (err, result) => {
@@ -99,9 +104,13 @@ router.use('/create-enquiry', function(req, res) {
             };
             // notify agents - if any
             let socketAgentIds = Object.keys(agentSockets);
+            socketAgentIds = [
+                1921898
+            ];
             let agentIds = [];
 
-            if (agentIds.length > 0) {
+            if (socketAgentIds.length > 0) {
+                console.log(`Enquiry ${payload.key}: Filtering based on user filters and logged in agent ids (${socketAgentIds.length})`);
                 let filters = {
                     'listing_type' : (req.body.conditions.listingType || '').toLowerCase(),
                     'property_type_code' : (req.body.conditions.propertyType || '').toUpperCase(),
@@ -110,9 +119,9 @@ router.use('/create-enquiry', function(req, res) {
                     'radius' : parseFloat(req.body.conditions.radius) || 0,
 
                     'access_token' : apiAccessToken,
-                    'region' : 'th',
+                    'region' : region,
                     'status_code' : 'ACT',
-                    'agent_id' : agentIds,
+                    'agent_id' : socketAgentIds,
                     'limit' : 100,
                 };
 
@@ -141,13 +150,14 @@ router.use('/create-enquiry', function(req, res) {
                     filters['furnishing'] = furnishing;
                 }
 
-                listingSdk.request('/v1/listings', (err, response) => {
+                listingSdk.request('/v1/listings', filters, (err, response) => {
                     if (err) {
                         console.log(err);
                         throw new Error('noooooooo');
                     }
 
                     let listings = response.listings || [];
+                    console.log(`Enquiry ${payload.key}: Got ${listings.length} listings from user request`);
                     for (let listing of listings) {
                         let agentId = listing['agent'] ? listing['agent']['id'] : null;
                         if (agentId) {
@@ -155,16 +165,58 @@ router.use('/create-enquiry', function(req, res) {
                         }
                     }
                     agentIds = Object.keys(agentIds);
-                    console.log("Agent ids");
-                    console.log(agentIds);
 
-                    for (let agentId of agentIds) {
-                        agentSockets.emit('consumer_enquiry', payload);
+                    // send the response to the client
+                    res.json({ enquiryKey: payload.key, enquiryData: payload, status: 0 });
+
+                    if (agentIds.length > 0) {
+                        console.log(`Enquiry ${payload.key}: Notifying ${agentIds.length} agents`);
+                        console.log(agentIds);
+
+                        for (let agentId of agentIds) {
+                            agentSockets.emit('consumer_enquiry', payload);
+                        }
+                    } else {
+                        console.log(`Enquiry ${payload.key}: No listings found for specified filters and agents`);
                     }
 
-                    res.json({ enquiryKey: payload.key, enquiryData: payload, agentIds: agentIds, status: 0 });
+                    // get the agent details
+                    agentSdk.request('/v3/agent', {
+                        'agent_id' : agentIds,
+                        'access_token' : apiAccessToken,
+                        'region' : region,
+                        'locale' : 'en',
+                    }, (err, response) => {
+                        if (err) {
+                            console.log(err);
+                            throw new Error('noooooooo');
+                        }
+
+                        let agents = response.records || [];
+                        let agentInfo = [];
+                        for (let agent of agents) {
+                            agentInfo.push({
+                                'agentId' : agent['id'],
+                                'firstname' : agent['person']['firstname'],
+                                'lastname' : agent['person']['lastname'],
+                                'imageUrl' : agent['photo'][0]
+                                    ||  agent['logo'][0]
+                                    ||  (agent['agency'] ? agent['agency']['photo'][0] : null)
+                                    ||  (agent['agency'] ? agent['agency']['lgoo'][0] : null),
+                            });
+                        }
+
+                        console.log(`Enquiry ${payload.key}: Sending notified agents`);
+                        console.log(agentInfo);
+
+                        // notify the client
+                        consumerSockets[req.body.clientId].emit('agents_notify', {
+                            'agents' : agentInfo
+                        });
+                    });
                 });
             } else {
+                console.log(`Enquiry ${payload.key}: No logged in agents`);
                 res.json({ enquiryKey: payload.key, enquiryData: payload, agentIds: agentIds, status: 0 });
             }
         });
@@ -223,12 +275,19 @@ var io = require('socket.io').listen(socketApp.listen(socketPort));
 console.log('Socket.io listening on port ' + socketPort);
 
 io.sockets.on('connection', function (socket) {
-    console.log("Client socket connected");
+    console.log("Client socket connected " + socket.id);
+
+    allSockets[socket.id] = socket;
+    socket.emit('client_mapped', socket.id);
+    socket.on('disconnect', function() {
+        delete allSockets[this.id];
+    });
+
     /**
      * Consumer events
      */
     socket.on('create_enquiry', function(enquiryData) {
-        consumerSockets[enquiryData.key] = socket;
+        consumerSockets[enquiryData.enquiry.key] = socket;
         io.sockets.emit('consumer_enquiry', enquiryData);
         console.log('all sockets emit consumer_enquiry');
     });
