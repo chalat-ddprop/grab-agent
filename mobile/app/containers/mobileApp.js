@@ -20,7 +20,7 @@ class MobileApp extends Component {
   }
 
   login(username, password) {
-    //REVISE: real login
+    //TODO: replace belowing hard-code to be fetch('url', {options}, ...)
     this.props.onLoginSuccess({
       agentId: 101,
       firstname: 'Andrei',
