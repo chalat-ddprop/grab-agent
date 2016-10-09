@@ -171,7 +171,8 @@ router.use('/create-enquiry', function(req, res) {
                         console.log(agentIds);
 
                         for (let agentId of agentIds) {
-                            agentSockets.emit('consumer_enquiry', payload);
+                            console.log(`Enquiry ${payload.key}: Notifying agent ${agentId}`);
+                            agentSockets[agentId].emit('consumer_enquiry', payload);
                         }
                     } else {
                         console.log(`Enquiry ${payload.key}: No listings found for specified filters and agents`);
@@ -210,6 +211,8 @@ router.use('/create-enquiry', function(req, res) {
                         allSockets[req.body.clientId].emit('agents_notify', {
                             'agents' : agentInfo
                         });
+
+                        console.log(`Enquiry ${payload.key}: Client notified`);
                     });
                 });
             } else {
