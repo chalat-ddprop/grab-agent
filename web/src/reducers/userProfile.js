@@ -1,4 +1,5 @@
 const initialData = {
+  clientId: '',
   userid: '',
   firstname: '',
   lastname: '',
@@ -15,6 +16,11 @@ const userProfile = (state = initialData, action) => {
 
     case 'CLEAR_USER_PROFILE':
       return initialData
+
+    case 'CLIENT_MAPPED':
+      return Object.assign({}, state, {
+        clientId: action.clientId
+      });
 
     default:
       return state

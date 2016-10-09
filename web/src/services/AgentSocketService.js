@@ -16,6 +16,10 @@ class AgentSocketService {
     this.socket.on('disconnect', disconnectCb);
   }
 
+  onClientMapped(cb) {
+    this.socket.on('client_mapped', cb);
+  }
+
   onAgentTyping(cb) {
     this.socket.on('agent_typing', cb);
   }

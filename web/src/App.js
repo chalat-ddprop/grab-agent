@@ -31,6 +31,7 @@ class App extends Component {
 
   componentWillMount() {
     this.socketService.connect(this.props.onConnected, this.props.onDisconnected)
+    this.socketService.onClientMapped(this.props.onClientMapped);
     this.socketService.onAgentTyping(this.props.onAgentTyping);
     this.socketService.onAgentResponse(this.props.onAgentResponse);
 
@@ -84,6 +85,11 @@ const mapDispatchToProps = (dispatch) => {
 
     closeSocketMessage: () => {
       dispatch({ type: 'CLOSE_POPUP' })
+    },
+
+    onClientMapped: (data) => {
+      console.log(data);
+      dispatch({ type: 'CLIENT_MAPPED', clientId: data.clientId })
     },
 
     onAgentTyping: (data) => {
