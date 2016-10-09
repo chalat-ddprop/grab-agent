@@ -124,3 +124,65 @@ export const getEnquiry = (enquiryKey) => {
     return loading(xhr)
   }
 }
+
+export const pickAgent = (agentId) => {
+  return {
+    type: 'PICK_AGENT',
+    agentId: agentId,
+  }
+}
+
+export const removeAgent = (agentId) => {
+  return {
+    type: 'REMOVE_AGENT',
+    agentId: agentId,
+  }
+}
+
+export const acceptAgent = (enquiryKey, agentId) => {
+  return (dispatch, getState, { enquiryService }) => {
+    dispatch(pickAgent(agentId));
+
+    let { apiConnection } = getState();
+
+    if (apiConnection.xhr) {
+      apiConnection.xhr.abort();
+    }
+
+    let xhr = enquiryService.acceptAgent(enquiryKey)
+      .then((response) => {
+        return response.json()
+      })
+      .then((json) => {
+        let enquiry = json[0];
+        dispatch(saved());
+        dispatch(updateEnquiry(enquiry.key, enquiry))
+      })
+
+    return saving(xhr)
+  }
+}
+
+export const denyAgent = (enquiryKey, agentId) => {
+  return (dispatch, getState, { enquiryService }) => {
+    dispatch(removeAgent(agentId));
+
+    let { apiConnection } = getState();
+
+    if (apiConnection.xhr) {
+      apiConnection.xhr.abort();
+    }
+
+    let xhr = enquiryService.denyAgent(enquiryKey)
+      .then((response) => {
+        return response.json()
+      })
+      .then((json) => {
+        let enquiry = json[0];
+        dispatch(saved());
+        dispatch(updateEnquiry(enquiry.key, enquiry))
+      })
+
+    return saving(xhr)
+  }
+}

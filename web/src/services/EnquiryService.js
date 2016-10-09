@@ -28,6 +28,20 @@ class EnquiryService {
       key: enquiryKey,
     })
   }
+
+  acceptAgent(enquiryKey, agentId) {
+    return this.post(`${this.url}/api/consumer-accept`, {
+      key: enquiryKey,
+      agentId: agentId,
+    })
+  }
+
+  denyAgent(enquiryKey, agentId) {
+    return this.post(`${this.url}/api/consumer-deny`, {
+      key: enquiryKey,
+      agentId: agentId,
+    })
+  }
 }
 
 export default EnquiryService
