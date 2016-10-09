@@ -101,11 +101,11 @@ const mapDispatchToProps = (dispatch) => {
     },
 
     onAgentTyping: (data) => {
-      dispatch(agentTyping(data.enquiryData.key, data.agentId))
+      dispatch(agentTyping(data.enquiryKey, data.agentId))
     },
 
     onAgentResponse: (data) => {
-      dispatch(agentResponse(data.enquiryData.key, data.agentId, data.message))
+      dispatch(agentResponse(data.enquiryKey, data.agentId, data.message))
     },
 
     onGmapLoaded: () => {

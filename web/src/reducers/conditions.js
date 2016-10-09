@@ -1,8 +1,8 @@
 const initialState = {
   listingType: 'SALE',
   propertyType: 'CONDO',
-  lat: null,
-  lng: null,
+  lat: 1.3181772,
+  lng: 103.8407591,
   radius: 10000, // 1 km
   bedroom: null,
   bathroom: null,

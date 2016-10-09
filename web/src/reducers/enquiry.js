@@ -36,13 +36,14 @@ const enquiry = (state = initialData, action) => {
       })
 
     case 'AGENT_TYPING':
+      console.log(action);
       if (state.key !== action.enquiryKey) {
         return state;
       }
 
       return Object.assign({}, state, {
-        agents: action.agents.map((agent) => {
-          if (agent.agentId === state.agentId) {
+        agents: state.agents.map((agent) => {
+          if (agent.agentId === action.agentId) {
             return {
               ...agent,
               status: 'TYPING',
@@ -59,8 +60,8 @@ const enquiry = (state = initialData, action) => {
       }
 
       return Object.assign({}, state, {
-        agents: action.agents.map((agent) => {
-          if (agent.agentId === state.agentId) {
+        agents: state.agents.map((agent) => {
+          if (agent.agentId === action.agentId) {
             return {
               ...agent,
               status: 'RESPONSED',
