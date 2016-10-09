@@ -1,8 +1,8 @@
 const initialData = {
   google: null,
   center: {
-    lat: null,
-    lng: null,
+    lat: 13.9080982,
+    lng: 100.1832428,
   }
 }
 

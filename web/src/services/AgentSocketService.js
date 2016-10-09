@@ -16,20 +16,12 @@ class AgentSocketService {
     this.socket.on('disconnect', disconnectCb);
   }
 
-  onAgentRequest(cb) {
-    this.socket.on('agent-request', cb);
+  onAgentTyping(cb) {
+    this.socket.on('agent_typing', cb);
   }
 
   onAgentResponse(cb) {
-    this.socket.on('agent-response', cb);
-  }
-
-  requestAgent(data, cb) {
-    this.socket.emit('agent-request', data, cb);
-  }
-
-  agentResponse(data, cb) {
-    this.socket.emit('agent-response', data, cb);
+    this.socket.on('agent_response', cb);
   }
 }
 

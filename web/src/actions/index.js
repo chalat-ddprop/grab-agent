@@ -87,6 +87,23 @@ export const clearEnquiry = () => {
   }
 }
 
+export const agentTyping = (enquiryKey, agentId) => {
+  return {
+    type: 'AGENT_TYPING',
+    enquiryKey: enquiryKey,
+    agentId: agentId,
+  }
+}
+
+export const agentResponse = (enquiryKey, agentId, message) => {
+  return {
+    type: 'AGENT_TYPING',
+    enquiryKey: enquiryKey,
+    agentId: agentId,
+    message: message,
+  }
+}
+
 export const pickAgent = (agentId) => {
   return {
     type: 'PICK_AGENT',
@@ -177,14 +194,13 @@ export const acceptAgent = (enquiryKey, agentId) => {
       apiConnection.xhr.abort();
     }
 
-    let xhr = enquiryService.acceptAgent(enquiryKey)
+    let xhr = enquiryService.acceptAgent(enquiryKey, agentId)
       .then((response) => {
         return response.json()
       })
       .then((json) => {
-        let enquiry = json[0];
         dispatch(saved());
-        dispatch(updateEnquiry(enquiry.key, enquiry))
+        dispatch(updateEnquiry(enquiryKey, json.enquiryData))
       })
 
     return saving(xhr)

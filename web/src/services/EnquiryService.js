@@ -10,7 +10,10 @@ class EnquiryService {
     return fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
       },
       body: JSON.stringify(params)
     })

@@ -10,10 +10,11 @@ import AppBar from 'material-ui/AppBar';
 import { List, ListItem } from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
 import Dialog from 'material-ui/Dialog';
+import Divider from 'material-ui/Divider';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import CircularProgress from 'material-ui/CircularProgress';
-import { blue500 as messageUnreadColor } from 'material-ui/styles/colors';
+import { blue500 as messageUnreadColor, green500 as acceptedAgent } from 'material-ui/styles/colors';
 
 class RequestAgent extends Component {
   constructor() {
@@ -71,26 +72,67 @@ class RequestAgent extends Component {
     this.props.onDenyAgent(this.props.enquiry.key, agent.agentId);
   }
 
+  onCallNumber(number) {
+    window.location.href = 'tel:' + number;
+  }
+
   render() {
+    let dialogActions = [
+      <FlatButton
+        label="Close"
+        onTouchTap={ this.onCloseMessage.bind(this) }
+      />
+    ];
+
     let item;
 
     if (this.props.enquiry == null) {
       item = null
     } else if (this.props.enquiry.status === 'INVALID') {
       item = <List><ListItem>Sorry! No agent is available in this area</ListItem></List>
-    } else if (this.props.enquiry.status === 'CLOSE') {
-
+    } else if (this.props.enquiry.status === 'CLOSE' && this.props.enquiry.agentInfo) {
+      let agentInfo = this.props.enquiry.agentInfo;
+      item = (
+        <div>
+          <List>
+            <ListItem
+              primaryText={ agentInfo.firstname + " " + agentInfo.lastname }
+              secondaryText="Accepted"
+              leftAvatar={ <Avatar src={ agentInfo.imageUrl } /> }
+              rightIcon={ <FontIcon className="material-icons" color={ acceptedAgent }>check</FontIcon> }
+              disabled={ true }
+              open={ true }
+              nestedItems={[
+                <Divider key="d1" />,
+                <ListItem
+                  key="mobile"
+                  primaryText={ '+66' + agentInfo.mobile }
+                  leftIcon={ <FontIcon className="material-icons">phone_iphone</FontIcon> }
+                  onTouchTap={ this.onCallNumber.bind(this, '+66' + agentInfo.mobile) }
+                />,
+                <Divider key="d2" />,
+                <ListItem
+                  key="tel"
+                  primaryText={ '+66' + agentInfo.tel }
+                  leftIcon={ <FontIcon className="material-icons">local_phone</FontIcon> }
+                  onTouchTap={ this.onCallNumber.bind(this, '+66' + agentInfo.tel) }
+                />,
+                <Divider key="d3" />,
+                <ListItem
+                  disabled={ true }
+                  key="message"
+                  primaryText={ agentInfo.message }
+                  leftIcon={ <FontIcon className="material-icons">chat</FontIcon> }
+                />,
+              ]}
+            />
+          </List>
+        </div>
+      )
     } else {
       if (this.props.enquiry.agents.length === 0) {
         item = <List><ListItem><CircularProgress /> Looking for agent to serve you ...</ListItem></List>
       } else {
-        let dialogActions = [
-          <FlatButton
-            label="Close"
-            onTouchTap={ this.onCloseMessage.bind(this) }
-          />
-        ];
-
         if (this.props.enquiry.status !== 'ACCEPT') {
           dialogActions = [
             <FlatButton
@@ -146,11 +188,11 @@ class RequestAgent extends Component {
               }) }
             </List>
             <Dialog
-                title={ !this.state.agent ? null : [this.state.agent.firstname, this.state.agent.lastname, "responsed with message"].join(' ') }
-                actions={ dialogActions }
-                modal={ false }
-                open={ this.state.open }
-                onRequestClose={ this.onCloseMessage }
+              title={ !this.state.agent ? null : [this.state.agent.firstname, this.state.agent.lastname, "responsed with message"].join(' ') }
+              actions={ dialogActions }
+              modal={ false }
+              open={ this.state.open }
+              onRequestClose={ this.onCloseMessage.bind(this) }
             >
                 { this.state.agent && this.state.agent.message }
             </Dialog>
