@@ -35,6 +35,43 @@ const enquiry = (state = initialData, action) => {
         })
       })
 
+    case 'AGENT_TYPING':
+      if (state.key !== action.enquiryKey) {
+        return state;
+      }
+
+      return Object.assign({}, state, {
+        agents: action.agents.map((agent) => {
+          if (agent.agentId === state.agentId) {
+            return {
+              ...agent,
+              status: 'TYPING',
+            }
+          }
+
+          return agent;
+        })
+      })
+
+    case 'AGENT_RESPONSE':
+      if (state.key !== action.enquiryKey) {
+        return state;
+      }
+
+      return Object.assign({}, state, {
+        agents: action.agents.map((agent) => {
+          if (agent.agentId === state.agentId) {
+            return {
+              ...agent,
+              status: 'RESPONSED',
+              message: action.message,
+            }
+          }
+
+          return agent
+        })
+      })
+
     case 'CLEAR_ENQUIRY':
       return Object.assign({}, initialData)
 

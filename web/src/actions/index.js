@@ -112,7 +112,7 @@ export const agentTyping = (enquiryKey, agentId) => {
 
 export const agentResponse = (enquiryKey, agentId, message) => {
   return {
-    type: 'AGENT_TYPING',
+    type: 'AGENT_RESPONSE',
     enquiryKey: enquiryKey,
     agentId: agentId,
     message: message,
