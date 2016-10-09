@@ -90,6 +90,7 @@ router.use('/create-enquiry', function(req, res) {
         'status': "OPEN",
         'timestamp' : new Date()
     };
+    console.log(req.body);
 
     console.log("Received client enquiry");
     console.log(enquiryData);
@@ -217,6 +218,8 @@ router.use('/create-enquiry', function(req, res) {
                             'agents' : agentInfo
                         });
 
+                        consumerSockets[payload.key] = allSockets[req.body.clientId];
+
                         console.log(`Enquiry ${payload.key}: Client notified`);
                     });
                 });
@@ -293,6 +296,7 @@ io.sockets.on('connection', function (socket) {
      */
     socket.on('create_enquiry', function(enquiryData) {
         consumerSockets[enquiryData.enquiry.key] = socket;
+        console.log(consumerSockets);
         io.sockets.emit('consumer_enquiry', enquiryData);
         console.log('all sockets emit consumer_enquiry');
     });
@@ -309,17 +313,17 @@ io.sockets.on('connection', function (socket) {
      * Agent events
      */
     socket.on('typing', function(data) {
-        var sock = consumerSockets[data.enquiryData.key];
+        var sock = consumerSockets[data.enquiryKey];
         sock.emit('agent_typing', {
-            'enquiryData' : data.enquiryData,
+            'enquiryKey' : data.enquiryKey,
             'agentId' : data.agentId
         });
         console.log('mapped socket emit agent_typing');
     });
     socket.on('response', function(data) {
-        var sock = consumerSockets[data.enquiryData.key];
+        var sock = consumerSockets[data.enquiryKey];
         sock.emit('agent_response', {
-            'enquiryData' : data.enquiryData,
+            'enquiryKey' : data.enquiryKey,
             'agentId' : data.agentId,
             'message' : data.message
         });
