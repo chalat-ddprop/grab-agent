@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
 import { bindActionCreators } from 'redux';
+import Login from '../components/login';
 import RequestList from '../components/requestList';
 import RequestDetail from '../components/requestDetail';
 import { connect } from 'react-redux';
@@ -16,7 +17,16 @@ class MobileApp extends Component {
     this.socket.on('connect', this.props.onSocketConnect);
     this.socket.on('disconnect', this.props.onSocketDisconnect);
     this.socket.on('consumer_enquiry', this.refresh.bind(this));
+  }
 
+  login(username, password) {
+    //REVISE: real login
+    this.props.onLoginSuccess({
+      agentId: 101,
+      firstname: 'Andrei',
+      lastname: 'Blotzu',
+      imageUrl: 'https://scontent.xx.fbcdn.net/v/t1.0-9/422665_2777709124390_659706876_n.jpg?oh=8420581225b63f4c99569c7c471478ba&oe=58A1B1B1',
+    });
     this.refresh();
   }
 
@@ -69,26 +79,34 @@ class MobileApp extends Component {
   }
 
   render() {
+    var content;
+    if (this.props.agentProfile) {
+      if (this.props.detail.item) {
+        content = <RequestDetail
+          item={this.props.detail.item}
+          onChangeMessage={this.messageChange.bind(this, this.props.detail.item)}
+          onSubmit={this.submit.bind(this, this.props.detail.item)}
+          onCancel={this.cancel.bind(this, this.props.detail.item)} />;
+      } else {
+        content = <RequestList
+          list={this.props.list}
+          onSelect={this.props.onListItemSelect} />;
+      }
+    } else {
+      content = <Login onLogin={this.login.bind(this)} />;
+    }
+
     return (
       <View style={styles.container}>
         <View style={styles.title}>
           <Image source={require('../../img/icon-agenanswer.png')} style={styles.titleLogo} />
-          <Text style={styles.titleText}>GrabAgentMobile</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleText}>GrabAgentMobile</Text>
+            <Text>{this.props.agentProfile ? (this.props.agentProfile.firstname + ' ' + this.props.agentProfile.lastname) : ''}</Text>
+          </View>
         </View>
 
-        <View>
-          {this.props.detail.item ?
-            <RequestDetail
-              item={this.props.detail.item}
-              onChangeMessage={this.messageChange.bind(this, this.props.detail.item)}
-              onSubmit={this.submit.bind(this, this.props.detail.item)}
-              onCancel={this.cancel.bind(this, this.props.detail.item)} />
-          :
-            <RequestList
-              list={this.props.list}
-              onSelect={this.props.onListItemSelect} />
-          }
-        </View>
+        <View>{content}</View>
 
         <Text style={styles.status}>
           Server {this.props.socket.connected ?
@@ -111,10 +129,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
+  titleContainer: {
+    flexDirection: 'column',
+    marginLeft: 12,
+    marginTop: 6,
+  },
   title: {
     flexDirection: 'row',
     marginTop: 60,
     alignItems: 'center',
+    marginBottom: 8,
   },
   titleLogo: {
     width: 60,
@@ -124,8 +148,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#CC2200',
-    marginLeft: 12,
-    marginTop: 6,
   },
   status: {
     textAlign: 'center',
@@ -138,7 +160,8 @@ const styles = StyleSheet.create({
 export default connect(state => ({
     list: state.list,
     detail: state.detail,
-    socket: state.socket
+    socket: state.socket,
+    agentProfile: state.agentProfile,
   }),
   (dispatch) => {
     return {
@@ -147,6 +170,9 @@ export default connect(state => ({
       },
       onSocketDisconnect: () => {
         return dispatch({ type: 'DISCONNECT' });
+      },
+      onLoginSuccess: (profile) => {
+        return dispatch({ type: 'LOGIN', profile: profile });
       },
       onRefresh: (data) => {
         return dispatch({ type: 'REFRESH', list: data });
