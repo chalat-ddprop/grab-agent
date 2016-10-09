@@ -1,10 +1,10 @@
-const socket = (state = { connected: false }, action) => {
+const socket = (state = { io: null, connected: false }, action) => {
   switch (action.type) {
     case 'CONNECT':
-      return { connected: true };
+      return { io: action.io, connected: true };
 
     case 'DISCONNECT':
-      return { connected: false };
+      return { io: null, connected: false };
 
     default:
       return state;

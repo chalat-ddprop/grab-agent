@@ -9,14 +9,18 @@ import {
 import Button from 'react-native-button';
 import { connect } from 'react-redux';
 
-export default class RequestDetail extends Component {
+class RequestDetail extends Component {
   componentWillMount() {
     this.setState({ message: this.props.defaultMessage || '' });
   }
 
   handleTextChanged(text) {
     this.setState({ message: text })
-    this.props.onChangeMessage();
+    this.props.onTyping(this.props.socket.io, this.props.item.key, 243703);
+  }
+
+  onSubmit() {
+    this.props.onResponseConsumer(this.props.socket.io, this.props.item.key, 243703, this.state.message)
   }
 
   render() {
@@ -30,7 +34,7 @@ export default class RequestDetail extends Component {
           Please return him some feedback message
         </Text>
 
-        <Image source={{uri: this.props.item.userProfile.imageUrl}} style={{width: 140, height: 140, margin: 6}} />
+        {/* <Image source={{uri: this.props.item.userProfile.imageUrl}} style={{width: 140, height: 140, margin: 6}} /> */}
         <Text style={styles.instructions}>{this.props.item.userProfile.firstname} {this.props.item.userProfile.lastname}{'\n'}</Text>
 
         <TextInput
@@ -43,7 +47,7 @@ export default class RequestDetail extends Component {
           <Button
             containerStyle={{padding:10, height:40, overflow:'hidden', borderRadius:4, backgroundColor: 'green', marginRight: 10}}
             style={{fontSize: 16, color: 'white'}}
-            onPress={this.props.onSubmit.bind(this, this.state.message)}>
+            onPress={this.onSubmit.bind(this)}>
             Submit
           </Button>
           <Button
@@ -81,3 +85,34 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
+
+const mapStateToProps = (state) => {
+  return {
+    socket: state.socket
+    // userProfile: state.userProfile,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onTyping: (socket, enquiryKey, agentId) => {
+      socket.emit('typing', {
+        enquiryKey,
+        agentId,
+      })
+    },
+
+    onResponseConsumer: (socket, enquiryKey, agentId, message) => {
+      socket.emit('response', {
+        enquiryKey,
+        agentId,
+        message,
+      })
+    },
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(RequestDetail)

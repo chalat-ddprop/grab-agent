@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
 import { bindActionCreators } from 'redux';
-import Login from '../components/login';
+// import Login from '../components/login';
 import RequestList from '../components/requestList';
 import RequestDetail from '../components/requestDetail';
 import { connect } from 'react-redux';
@@ -14,28 +14,35 @@ import io from 'socket.io-client/socket.io';
 class MobileApp extends Component {
   componentWillMount() {
     this.socket = io('http://localhost:3700', {jsonp: false});
-    this.socket.on('connect', this.props.onSocketConnect);
+    this.socket.on('connect', this.props.onSocketConnect.bind(this, this.socket));
+    this.socket.on('connect', this.login.bind(this));
     this.socket.on('disconnect', this.props.onSocketDisconnect);
-    this.socket.on('consumer_enquiry', this.refresh.bind(this));
+    // this.socket.on('consumer_enquiry', this.refresh.bind(this));
+    this.socket.on('consumer_enquiry', this.onConsumerEnquiry.bind(this));
   }
 
   login(username, password) {
     //TODO: replace belowing hard-code to be fetch('url', {options}, ...)
     this.props.onLoginSuccess({
-      agentId: 101,
+      agentId: 243703,
       firstname: 'Andrei',
       lastname: 'Blotzu',
       imageUrl: 'https://scontent.xx.fbcdn.net/v/t1.0-9/422665_2777709124390_659706876_n.jpg?oh=8420581225b63f4c99569c7c471478ba&oe=58A1B1B1',
     });
-    this.refresh();
+    this.socket.emit('login', {agentId: 243703});
+    // this.refresh();
   }
 
-  refresh() {
-    fetch('http://localhost:4300/api/get-enquiries')
-      .then((response) => response.json())
-      .then((responseData) => {
-        this.props.onRefresh(responseData);
-      });
+  // refresh() {
+  //   fetch('http://localhost:4300/api/get-enquiries')
+  //     .then((response) => response.json())
+  //     .then((responseData) => {
+  //       this.props.onRefresh(responseData);
+  //     });
+  // }
+
+  onConsumerEnquiry(data) {
+    this.props.onRefresh([data]);
   }
 
   messageChange(item) {
@@ -80,7 +87,7 @@ class MobileApp extends Component {
 
   render() {
     var content;
-    if (this.props.agentProfile) {
+    // if (this.props.agentProfile) {
       if (this.props.detail.item) {
         content = <RequestDetail
           item={this.props.detail.item}
@@ -92,9 +99,9 @@ class MobileApp extends Component {
           list={this.props.list}
           onSelect={this.props.onListItemSelect} />;
       }
-    } else {
-      content = <Login onLogin={this.login.bind(this)} />;
-    }
+    // } else {
+      // content = <Login onLogin={this.login.bind(this)} />;
+    // }
 
     return (
       <View style={styles.container}>
@@ -165,8 +172,8 @@ export default connect(state => ({
   }),
   (dispatch) => {
     return {
-      onSocketConnect: () => {
-        return dispatch({ type: 'CONNECT' });
+      onSocketConnect: (io) => {
+        return dispatch({ type: 'CONNECT', io: io });
       },
       onSocketDisconnect: () => {
         return dispatch({ type: 'DISCONNECT' });

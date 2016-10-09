@@ -40,7 +40,7 @@ class RequestListItem extends Component {
     return (
       <TouchableOpacity style={styles.listItem} onPress={this.props.onSelect.bind(this, this.props.item)}>
         <View style={styles.listItem_container}>
-          <Image source={{uri: this.props.item.userProfile.imageUrl}} style={{width: 64, height: 64}} />
+          {/* <Image source={{uri: this.props.item.userProfile.imageUrl}} style={{width: 64, height: 64}} /> */}
           <Text style={styles.listItem_customername}>{this.props.item.userProfile.firstname} {this.props.item.userProfile.lastname}</Text>
           <Text style={styles.listItem_timestamp}>{moment(this.props.item.timestamp).format('LT')}</Text>
         </View>
@@ -77,8 +77,12 @@ const styles = StyleSheet.create({
   }
 });
 
+const mapStateToProps = (state) => {
+  return {
+    list: state.list,
+  }
+}
 
-export default connect(state => ({
-    list: state.list
-  })
+export default connect(
+  mapStateToProps
 )(RequestList);
