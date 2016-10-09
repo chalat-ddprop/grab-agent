@@ -104,9 +104,6 @@ router.use('/create-enquiry', function(req, res) {
             };
             // notify agents - if any
             let socketAgentIds = Object.keys(agentSockets);
-            socketAgentIds = [
-                1921898
-            ];
             let agentIds = [];
 
             if (socketAgentIds.length > 0) {
@@ -210,7 +207,7 @@ router.use('/create-enquiry', function(req, res) {
                         console.log(agentInfo);
 
                         // notify the client
-                        consumerSockets[req.body.clientId].emit('agents_notify', {
+                        allSockets[req.body.clientId].emit('agents_notify', {
                             'agents' : agentInfo
                         });
                     });
