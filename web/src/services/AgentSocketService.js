@@ -31,6 +31,10 @@ class AgentSocketService {
   onAgentResponse(cb) {
     this.socket.on('agent_response', cb);
   }
+
+  onAgentDeal(cb) {
+    this.socket.on('agent_deal', cb);
+  }
 }
 
 export default AgentSocketService;

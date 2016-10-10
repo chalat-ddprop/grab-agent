@@ -14,6 +14,7 @@ const initialData = {
     message: '',
   },
   agents: [],
+  agentProfile: null,
   status: null,
 }
 
@@ -36,7 +37,6 @@ const enquiry = (state = initialData, action) => {
       })
 
     case 'AGENT_TYPING':
-      console.log(action);
       if (state.key !== action.enquiryKey) {
         return state;
       }
@@ -71,6 +71,17 @@ const enquiry = (state = initialData, action) => {
 
           return agent
         })
+      })
+
+    case 'AGENT_DEAL':
+      return Object.assign({}, state, {
+        agentInfo: {
+          ...action.agentProfile,
+          message: state.agents.filter((agent) => {
+            return agent.agentId == action.agentProfile.agentId;
+          })[0].message
+        },
+        status: 'CLOSE'
       })
 
     case 'CLEAR_ENQUIRY':

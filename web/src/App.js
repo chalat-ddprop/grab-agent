@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { agentsNotify, agentTyping, agentResponse, updateEnquiryStatus } from './actions';
+import { agentsNotify, agentTyping, agentResponse, agentDeal, updateEnquiryStatus } from './actions';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { red600 } from 'material-ui/styles/colors';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -35,6 +35,7 @@ class App extends Component {
     this.socketService.onAgentsNotify(this.props.onAgentsNotify);
     this.socketService.onAgentTyping(this.props.onAgentTyping);
     this.socketService.onAgentResponse(this.props.onAgentResponse);
+    this.socketService.onAgentDeal(this.props.onAgentDeal);
 
     var gmap = document.createElement('script');
     gmap.setAttribute('src', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyC3nELX2pb92oNoCtQWqvazzngLwwuk1TA');
@@ -106,6 +107,10 @@ const mapDispatchToProps = (dispatch) => {
 
     onAgentResponse: (data) => {
       dispatch(agentResponse(data.enquiryKey, data.agentId, data.message))
+    },
+
+    onAgentDeal: (data) => {
+      dispatch(agentDeal(data.enquiryKey, data.agentProfile))
     },
 
     onGmapLoaded: () => {

@@ -119,6 +119,14 @@ export const agentResponse = (enquiryKey, agentId, message) => {
   }
 }
 
+export const agentDeal = (enquiryKey, agentProfile) => {
+  return {
+    type: 'AGENT_DEAL',
+    enquiryKey: enquiryKey,
+    agentProfile: agentProfile,
+  }
+}
+
 export const pickAgent = (agentId) => {
   return {
     type: 'PICK_AGENT',
