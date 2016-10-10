@@ -39,6 +39,10 @@ class RequestAgent extends Component {
   }
 
   componentWillUnmount() {
+    this.props.clearEnquiry()
+  }
+
+  componentWillUnmount() {
     if (this.props.enquiry.status !== 'CLOSE') {
       this.props.onCancelEnquiry(this.props.enquiry.key)
     }
@@ -110,13 +114,15 @@ class RequestAgent extends Component {
                   leftIcon={ <FontIcon className="material-icons">phone_iphone</FontIcon> }
                   onTouchTap={ agentInfo.mobile ? this.onCallNumber.bind(this, agentInfo.mobile) : null }
                 />,
-                <Divider key="d2" />,
-                <ListItem
-                  key="tel"
-                  primaryText={ agentInfo.tel || "" }
-                  leftIcon={ <FontIcon className="material-icons">local_phone</FontIcon> }
-                  onTouchTap={ agentInfo.tel ? this.onCallNumber.bind(this, agentInfo.tel) : null }
-                />,
+                (agentInfo.tel == null ? null : <Divider key="d2" />),
+                (agentInfo.tel == null ? null :
+                  <ListItem
+                    key="tel"
+                    primaryText={ agentInfo.tel || "" }
+                    leftIcon={ <FontIcon className="material-icons">local_phone</FontIcon> }
+                    onTouchTap={ agentInfo.tel ? this.onCallNumber.bind(this, agentInfo.tel) : null }
+                  />
+                ),
                 <Divider key="d3" />,
                 <ListItem
                   disabled={ true }
@@ -238,6 +244,10 @@ const mapDispatchToProps = (dispatch) => {
     onDenyAgent: (enquiryKey, agentId) => {
       dispatch(denyAgent(enquiryKey, agentId));
     },
+
+    clearEnquiry: () => {
+      dispatch({action: 'CLEAR_ENQUIRY'})
+    }
   }
 }
 
