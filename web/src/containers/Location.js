@@ -9,7 +9,11 @@ import FloatingTopRightButton from '../components/FloatingTopRightButton';
 
 class Location extends Component {
   componentWillMount() {
-    this.props.onCenterMap(this.props.lat, this.props.lng);
+    if (!this.props.lat || !this.props.lng) {
+      this.props.onLocatePosition()
+    } else {
+      this.props.onCenterMap(this.props.lat, this.props.lng)
+    }
   }
 
   render() {
