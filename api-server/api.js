@@ -199,10 +199,14 @@ router.use('/create-enquiry', function(req, res) {
                         let agents = response.records || [];
                         let agentInfo = [];
                         for (let agent of agents) {
+                            let mobile = agent['webUser']['person'] && agent['webUser']['person']['mobile'] ? agent['webUser']['person']['mobile'] : null;
+                            let tel = agent['webUser']['person'] && agent['webUser']['person']['telephone'] ? agent['webUser']['person']['telephone'] : null;
                             let agentProfile = {
                                 'agentId' : agent['id'],
                                 'firstname' : agent['webUser']['person']['firstname'],
                                 'lastname' : agent['webUser']['person']['lastname'],
+                                'mobile' : mobile ? `+${mobile.countryCode}${mobile.subscriberNumber}` : null,
+                                'tel' : tel ? `+${tel.countryCode}${tel.subscriberNumber}` : null,
                                 'imageUrl' : agent['photo'][0]
                                     ||  agent['logo'][0]
                                     ||  (agent['agency'] ? agent['agency']['photo'][0] : null)
