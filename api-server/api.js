@@ -199,8 +199,8 @@ router.use('/create-enquiry', function(req, res) {
                         let agents = response.records || [];
                         let agentInfo = [];
                         for (let agent of agents) {
-                            let mobile = agent['webUser']['person'] && agent['webUser']['person']['mobile'] ? agent['webUser']['person']['mobile'] : null;
-                            let tel = agent['webUser']['person'] && agent['webUser']['person']['telephone'] ? agent['webUser']['person']['telephone'] : null;
+                            let mobile = agent['webUser']['person'] && agent['webUser']['person']['contactInformation'] && agent['webUser']['person']['contactInformation']['mobile'] ? agent['webUser']['person']['contactInformation']['mobile'] : null;
+                            let tel = agent['webUser']['person'] && agent['webUser']['person']['contactInformation'] && agent['webUser']['person']['contactInformation']['telephone'] ? agent['webUser']['person']['contactInformation']['telephone'] : null;
                             let agentProfile = {
                                 'agentId' : agent['id'],
                                 'firstname' : agent['webUser']['person']['firstname'],
