@@ -15,6 +15,7 @@ let apiAccessToken = process.env['PG_ACCESS_TOKEN'] || '';
 let consumerSockets = {};
 let allSockets = {};
 let agentSockets = {};
+let agentProfiles = {};
 let region = 'sg';
 
 let mockAgents = [
@@ -198,7 +199,7 @@ router.use('/create-enquiry', function(req, res) {
                         let agents = response.records || [];
                         let agentInfo = [];
                         for (let agent of agents) {
-                            agentInfo.push({
+                            let agentProfile = {
                                 'agentId' : agent['id'],
                                 'firstname' : agent['webUser']['person']['firstname'],
                                 'lastname' : agent['webUser']['person']['lastname'],
@@ -206,7 +207,10 @@ router.use('/create-enquiry', function(req, res) {
                                     ||  agent['logo'][0]
                                     ||  (agent['agency'] ? agent['agency']['photo'][0] : null)
                                     ||  (agent['agency'] ? agent['agency']['lgoo'][0] : null),
-                            });
+                            }
+
+                            agentProfiles[agent['id']] = agentProfile;
+                            agentInfo.push(agentProfile);
                         }
 
                         console.log(`Enquiry ${payload.key}: Sending notified agents`);
@@ -261,6 +265,28 @@ router.post('/agent-cancel', function(req, res) {
 })
 
 router.post('/consumer-accept', function(req, res) {
+  let enquiryKey = req.body.key,
+      agentId = req.body.agentId;
+
+  dbConnection.collection(mongoCollectionName).find({_id: ObjectID(enquiryKey)}, (err, result) => {
+    result.toArray((err, arr) => {
+      if (arr.length) {
+        let enquiry = arr[0],
+          data = {
+            enquiryKey: enquiryKey,
+            userProfile: enquiry.userProfile,
+            conditions: enquiry.conditions,
+            agentProfile: agentProfiles[agentId]
+          },
+          consumerSoc = consumerSockets[enquiryKey],
+          agentSoc = agentSockets[agentId];
+
+        consumerSoc.emit('agent_deal', data);
+        agentSoc.emit('consumer_deal', data);
+      }
+    })
+  });
+
 	res.json();
 })
 
