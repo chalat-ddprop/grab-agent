@@ -65,11 +65,11 @@ MongoClient.connect(mongoUrl, function(err, db) {
 // init sdks
 let listingSdk = new imports.SDKHttpClient({
     "scheme" : "https",
-    "host" : "api.staging.propertyguru.com",
+    "host" : "api.propertyguru.com",
 });
 let agentSdk = new imports.SDKHttpClient({
     "scheme" : "https",
-    "host" : "api.staging.propertyguru.com",
+    "host" : "api.propertyguru.com",
 });
 
 // init express
