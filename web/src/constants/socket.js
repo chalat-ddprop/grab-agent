@@ -1,5 +1,5 @@
 export const socket = {
   scheme: 'http',
-  host: 'localhost',//'grabagent.guruestate.com',
+  host: 'localhost',
   port: 3700,
 }
