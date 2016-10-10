@@ -9,9 +9,7 @@ import FloatingTopRightButton from '../components/FloatingTopRightButton';
 
 class Location extends Component {
   componentWillMount() {
-    if (!this.props.conditions.lat || !this.props.conditions.lng) {
-      this.props.onLocatePosition();
-    }
+    this.props.onCenterMap(this.props.lat, this.props.lng);
   }
 
   render() {
@@ -67,6 +65,17 @@ const mapDispatchToProps = (dispatch) => {
 
     onSelectPosition: (mapProps, map, e) => {
       dispatch(updateConditionPosition(e.latLng.lat(), e.latLng.lng()));
+    },
+
+    onCenterMap: (lat, lng) => {
+      if (lat && lng) {
+        dispatch(updateMapCenter(lat, lng));
+      } else if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          let { coords } = pos;
+          dispatch(updateMapCenter(coords.latitude, coords.longitude));
+        })
+      }
     },
 
     onLocatePosition: () => {
