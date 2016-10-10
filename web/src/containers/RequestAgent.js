@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-import { getEnquiry, cancelEnquiry, acceptAgent, denyAgent } from '../actions';
+import { getEnquiry, cancelEnquiry, clearEnquiry, acceptAgent, denyAgent } from '../actions';
 
 import CompactList from '../components/CompactList';
 import LoadingBar from '../components/LoadingBar';
@@ -39,13 +39,10 @@ class RequestAgent extends Component {
   }
 
   componentWillUnmount() {
-    this.props.clearEnquiry()
-  }
-
-  componentWillUnmount() {
     if (this.props.enquiry.status !== 'CLOSE') {
       this.props.onCancelEnquiry(this.props.enquiry.key)
     }
+    this.props.clearEnquiry()
   }
 
   getEnquiry(enquiryKey) {
@@ -246,7 +243,7 @@ const mapDispatchToProps = (dispatch) => {
     },
 
     clearEnquiry: () => {
-      dispatch({action: 'CLEAR_ENQUIRY'})
+      dispatch(clearEnquiry())
     }
   }
 }

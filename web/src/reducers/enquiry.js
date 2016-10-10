@@ -85,7 +85,7 @@ const enquiry = (state = initialData, action) => {
       })
 
     case 'CLEAR_ENQUIRY':
-      return Object.assign({}, initialData)
+      return Object.assign({}, state, initialData)
 
     case 'PICK_AGENT':
       return Object.assign({}, state, {
