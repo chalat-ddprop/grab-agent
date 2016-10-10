@@ -106,14 +106,14 @@ class RequestAgent extends Component {
                 <Divider key="d1" />,
                 <ListItem
                   key="mobile"
-                  primaryText={ '+66' + agentInfo.mobile }
+                  primaryText={ agentInfo.mobile || "" }
                   leftIcon={ <FontIcon className="material-icons">phone_iphone</FontIcon> }
                   onTouchTap={ this.onCallNumber.bind(this, agentInfo.mobile) }
                 />,
                 <Divider key="d2" />,
                 <ListItem
                   key="tel"
-                  primaryText={ '+66' + agentInfo.tel }
+                  primaryText={ agentInfo.tel || "" }
                   leftIcon={ <FontIcon className="material-icons">local_phone</FontIcon> }
                   onTouchTap={ this.onCallNumber.bind(this, agentInfo.tel) }
                 />,
